@@ -6,7 +6,7 @@ function create_logs!(m)
     # Timers
     logs[:presolve_time] = 0.       # Total presolve-time of the algorithm
     logs[:total_time] = 0.          # Total run-time of the algorithm
-    logs[:time_left] = m.time_limit    # Total remaining time of the algorithm if time_limit is specified
+    logs[:time_left] = m.timeout    # Total remaining time of the algorithm if timeout is specified
 
     # Values
     logs[:obj] = []                 # Iteration based objective
@@ -24,13 +24,13 @@ end
 
 function reset_timer(m::PODNonlinearModel)
     m.logs[:total_time] = 0.
-    m.logs[:time_left] = m.time_limit
+    m.logs[:time_left] = m.timeout
     return m
 end
 
 function logging_summary(m::PODNonlinearModel)
 
-    if m.log_level > 0
+    if m.loglevel > 0
         print_with_color(:light_yellow, "full problem loaded into POD\n")
         println("problen sense $(m.sense_orig)")
         println("# of constraints = ", m.num_constr_orig)
@@ -55,7 +55,7 @@ function logging_summary(m::PODNonlinearModel)
         println("MIP solver = ", split(string(m.mip_solver),".")[1])
         println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
         println("                    SOLVER CONFIGURATION ")
-        println("maximum solution time = ", m.time_limit)
+        println("maximum solution time = ", m.timeout)
         println("maximum iterations =  ", m.max_iter)
         @printf "relative optimality gap criteria = %.5f (%.4f %%)\n" m.rel_gap (m.rel_gap*100)
         println("default tolerance = ", m.tol)

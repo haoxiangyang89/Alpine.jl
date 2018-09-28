@@ -1,13 +1,13 @@
 @testset "PODNonlinearModel loading tests" begin
     # Random Model 1
-    test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100)
+    test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(loglevel=0),loglevel=100)
     m = operator_c(solver=test_solver)
 
     status = JuMP.build(m)
     @test isa(m.internalModel, POD.PODNonlinearModel)
 
     # Expression Model 1
-    test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100)
+    test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(loglevel=0),loglevel=100)
     m = exprstest(solver=test_solver)
     status = JuMP.build(m)
     @test isa(m.internalModel, POD.PODNonlinearModel)
@@ -17,13 +17,13 @@ end
 
     # Select all NL variable
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=0,
                             disc_uniform_rate=10,
                             presolve_bp = false,
                             presolve_bt = false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -35,13 +35,13 @@ end
 
     # Select all NL variable
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=2,
                             disc_uniform_rate=10,
                             presolve_bp = false,
                             presolve_bt = false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -53,13 +53,13 @@ end
 
     # Minimum vertex cover algorithm
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=1,
                             disc_uniform_rate=10,
                             presolve_bp = false,
                             presolve_bt = false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -71,12 +71,12 @@ end
 
     # Adaptive variable selection scheme :: disc_var_pick = 3
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=3,
                             presolve_bp = false,
                             presolve_bt = false,
                             max_iter=2,
-                            log_level=100)
+                            loglevel=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -91,13 +91,13 @@ end
 
     # Select all NL variable
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=0,
                             disc_uniform_rate=10,
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
 
     m = castro2m2(solver=test_solver)
     status = solve(m)
@@ -111,13 +111,13 @@ end
 
     # Select minimum vertex cover
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=1,
                             disc_uniform_rate=10,
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
 
     m = castro2m2(solver=test_solver)
     status = solve(m)
@@ -130,13 +130,13 @@ end
 
     # Criteria 15 static selection
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=2,
                             disc_uniform_rate=15,
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
 
     m = castro2m2(solver=test_solver)
     status = solve(m)
@@ -154,12 +154,12 @@ end
     # Select all NL variable
     test_solver = PODSolver(minlp_solver=pavito_solver,
                             nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=0,
                             disc_uniform_rate=10,
                             presolve_bt=false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
 
     m = blend029_gl(solver=test_solver)
     JuMP.build(m)
@@ -172,13 +172,13 @@ end
     # Minimum vertex cover
     test_solver = PODSolver(minlp_solver=pavito_solver,
                             nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=1,
                             disc_uniform_rate=10,
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
 
     m = blend029_gl(solver=test_solver)
     JuMP.build(m)
@@ -191,13 +191,13 @@ end
     # Adaptive Scheme vertex cover
     test_solver = PODSolver(minlp_solver=pavito_solver,
                             nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=2,
                             disc_uniform_rate=10,
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
 
     m = blend029_gl(solver=test_solver)
     JuMP.build(m)
@@ -213,12 +213,12 @@ end
 
     # Dynamic Scheme step 2
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=3,
                             presolve_bp=true,
                             presolve_bt=false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
 
     m = castro6m2(solver=test_solver)
     status = solve(m)
@@ -234,12 +234,12 @@ end
 
     # Dynamic Scheme step 2
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=3,
                             presolve_bp=true,
                             presolve_bt=false,
                             max_iter=2,
-                            log_level=100)
+                            loglevel=100)
 
     m = castro6m2(solver=test_solver)
     status = solve(m)
@@ -256,13 +256,13 @@ end
 
 @testset "Test getsolvetime for time tracking" begin
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                            mip_solver=CbcSolver(log_level=0),
+                            mip_solver=CbcSolver(loglevel=0),
                             disc_var_pick=0,
                             disc_uniform_rate=10,
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            log_level=100)
+                            loglevel=100)
 
     m = castro2m2(solver=test_solver)
     status = solve(m)

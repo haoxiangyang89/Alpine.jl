@@ -71,14 +71,14 @@ function minmax_bound_tightening(m::PODNonlinearModel; use_bound = true, timelim
 
     discretization = to_discretization(m, m.l_var_tight, m.u_var_tight)
     if use_bound == false && haskey(options, :use_tmc)
-        (m.log_level > 0) && warn("[BOUND TIGHTENING ALGO] TMC chosen by the user, but local solve infeasible; defaulting to doing bound-tightening without TMC.")
+        (m.loglevel > 0) && warn("[BOUND TIGHTENING ALGO] TMC chosen by the user, but local solve infeasible; defaulting to doing bound-tightening without TMC.")
     end
     if use_bound == true && haskey(options, :use_tmc)
         discretization = add_adaptive_partition(m, use_solution=m.best_sol, use_disc=discretization)
     end
     discretization = resolve_var_bounds(m, discretization) # recomputation of bounds for lifted_variables
 
-    (m.log_level > 0) && println("starting the bound-tightening algorithm ...")
+    (m.loglevel > 0) && println("starting the bound-tightening algorithm ...")
 
     # start of the solve
     keeptightening = true
@@ -88,7 +88,7 @@ function minmax_bound_tightening(m::PODNonlinearModel; use_bound = true, timelim
 
         keeptightening = false
         m.logs[:bt_iter] += 1
-        m.log_level > 199 && println("[DEBUG] Iteration - $(m.logs[:bt_iter])")
+        m.loglevel > 199 && println("[DEBUG] Iteration - $(m.logs[:bt_iter])")
         temp_bounds = Dict()
 
         # Perform Bound Contraction
@@ -137,16 +137,16 @@ function minmax_bound_tightening(m::PODNonlinearModel; use_bound = true, timelim
                 discretization[var_idx][end] = temp_bounds[var_idx][end]
             end
             total_reduction += bound_reduction
-            (m.log_level > 99) && print("+")
-            (m.log_level > 99) && println("[DEBUG] VAR $(var_idx) LB contracted $(discretization[var_idx][1])=>$(temp_bounds[var_idx][1])")
-            (m.log_level > 99) && print("+")
-            (m.log_level > 99) && println("[DEBUG] VAR $(var_idx) UB contracted $(discretization[var_idx][end])=>$(temp_bounds[var_idx][end])")
+            (m.loglevel > 99) && print("+")
+            (m.loglevel > 99) && println("[DEBUG] VAR $(var_idx) LB contracted $(discretization[var_idx][1])=>$(temp_bounds[var_idx][1])")
+            (m.loglevel > 99) && print("+")
+            (m.loglevel > 99) && println("[DEBUG] VAR $(var_idx) UB contracted $(discretization[var_idx][end])=>$(temp_bounds[var_idx][end])")
         end
 
         avg_reduction = total_reduction/length(keys(temp_bounds))
         keeptightening = (avg_reduction > 1e-3)
         
-        (m.log_level > 0) && print("\n")
+        (m.loglevel > 0) && print("\n")
         discretization = resolve_var_bounds(m, discretization)
         if haskey(options, :use_tmc)
             discretization = add_adaptive_partition(m, use_solution=m.best_sol, use_disc=flatten_discretization(discretization))
@@ -156,18 +156,18 @@ function minmax_bound_tightening(m::PODNonlinearModel; use_bound = true, timelim
         time() - st > timelimit && break
     end
 
-    (m.log_level > 0) && println("\nfinished bound tightening in $(m.logs[:bt_iter]) iterations, applying tighten bounds")
+    (m.loglevel > 0) && println("\nfinished bound tightening in $(m.logs[:bt_iter]) iterations, applying tighten bounds")
 
     m.l_var_tight, m.u_var_tight = update_var_bounds(discretization)
     m.discretization = add_adaptive_partition(m, use_solution=m.best_sol)
 
     for i in m.disc_vars
         contract_ratio = round(1-abs(m.l_var_tight[i] - m.u_var_tight[i])/abs(l_var_orig[i] - u_var_orig[i]),2)*100
-        if m.log_level > 0 && contract_ratio > 0.0001
+        if m.loglevel > 0 && contract_ratio > 0.0001
             println("[DEBUG] VAR $(i) BOUND contracted $(contract_ratio)% |$(round(l_var_orig[i],4)) --> | $(round(m.l_var_tight[i],4)) - $(round(m.u_var_tight[i],4)) | <-- $(round(u_var_orig[i],4)) |")
         end
     end
-    (m.log_level > 0) && print("\n")
+    (m.loglevel > 0) && print("\n")
 
     return
 end
@@ -195,7 +195,7 @@ function create_bound_tightening_model(m::PODNonlinearModel, discretization, bou
 
     cputime_build = time() - start_build
     m.logs[:total_time] += cputime_build
-    m.logs[:time_left] = max(0.0, m.time_limit - m.logs[:total_time])
+    m.logs[:time_left] = max(0.0, m.timeout - m.logs[:total_time])
 
     return
 end
@@ -211,16 +211,16 @@ function solve_bound_tightening_model(m::PODNonlinearModel; kwargs...)
 
     # ========= MILP Solve ========= #
     if m.presolve_bt_mip_time_limit < Inf
-        update_mip_time_limit(m, timelimit = max(0.0, min(m.presolve_bt_mip_time_limit, m.time_limit - m.logs[:total_time])))
+        update_mip_time_limit(m, timelimit = max(0.0, min(m.presolve_bt_mip_time_limit, m.timeout - m.logs[:total_time])))
     else
-        update_mip_time_limit(m, timelimit = max(0.0, m.time_limit - m.logs[:total_time]))
+        update_mip_time_limit(m, timelimit = max(0.0, m.timeout - m.logs[:total_time]))
     end
 
     start_solve = time()
     status = solve(m.model_mip, suppress_warnings=true, relaxation=m.presolve_bt_relax) #TODO Double check here
     cputime_solve = time() - start_solve
     m.logs[:total_time] += cputime_solve
-    m.logs[:time_left] = max(0.0, m.time_limit - m.logs[:total_time])
+    m.logs[:time_left] = max(0.0, m.timeout - m.logs[:total_time])
     # ========= MILP Solve ========= #
 
     return status

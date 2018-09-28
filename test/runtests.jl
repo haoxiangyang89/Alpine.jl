@@ -13,7 +13,7 @@ for i in examples
     include(joinpath(Pkg.dir("POD"), "test", "examples", i))
 end
 
-pavito_solver=PavitoSolver(mip_solver=CbcSolver(log_level=0), cont_solver=IpoptSolver(print_level=0), mip_solver_drives=false, log_level=0)
+pavito_solver=PavitoSolver(mip_solver=CbcSolver(loglevel=0), cont_solver=IpoptSolver(print_level=0), mip_solver_drives=false, loglevel=0)
 
 # Performe Tests
 include("$(poddir)/test/solver.jl")

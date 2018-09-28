@@ -8,7 +8,7 @@ function MathProgBase.optimize!(m::PODNonlinearModel)
     end
     presolve(m)
     global_solve(m)
-    m.log_level > 0 && logging_row_entry(m, finsih_entry=true)
+    m.loglevel > 0 && logging_row_entry(m, finsih_entry=true)
     summary_status(m)
     return
 end
@@ -27,7 +27,7 @@ For example, this algorithm can easily be reformed as a uniform-partitioning alg
 """
 function global_solve(m::PODNonlinearModel)
 
-    m.log_level > 0 && logging_head(m)
+    m.loglevel > 0 && logging_head(m)
     m.presolve_track_time || reset_timer(m)
 
     while !check_exit(m)
@@ -36,7 +36,7 @@ function global_solve(m::PODNonlinearModel)
         bounding_solve(m)                       # Solve the relaxation model
         update_opt_gap(m)                       # Update optimality gap
         check_exit(m) && break                  # Feasibility check
-        m.log_level > 0 && logging_row_entry(m)  # Logging
+        m.loglevel > 0 && logging_row_entry(m)  # Logging
         local_solve(m)                          # Solve local model for feasible solution
         update_opt_gap(m)                       # Update optimality gap
         check_exit(m) && break                  # Detect optimality termination
@@ -54,8 +54,8 @@ end
 function presolve(m::PODNonlinearModel)
 
     start_presolve = time()
-    m.log_level > 0 && println("\nPOD algorithm presolver started.")
-    m.log_level > 0 && println("performing local solve to obtain a feasible solution.")
+    m.loglevel > 0 && println("\nPOD algorithm presolver started.")
+    m.loglevel > 0 && println("performing local solve to obtain a feasible solution.")
     local_solve(m, presolve = true)
 
     # Possible solver status, return error when see different
@@ -63,18 +63,18 @@ function presolve(m::PODNonlinearModel)
     status_reroute = [:Infeasible, :Infeasibles]
 
     if m.status[:local_solve] in status_pass
-        m.log_level > 0 && println("local solver returns feasible point")
+        m.loglevel > 0 && println("local solver returns feasible point")
         bound_tightening(m, use_bound = true)    # performs bound-tightening with the local solve objective value
         m.presolve_bt && init_disc(m)            # Re-initialize discretization dictionary on tight bounds
         m.disc_ratio_branch && (m.disc_ratio = update_disc_ratio(m, true))
         add_partition(m, use_solution=m.best_sol)  # Setting up the initial discretization
-        m.log_level > 0 && println("presolve ended.")
+        m.loglevel > 0 && println("presolve ended.")
     elseif m.status[:local_solve] in status_reroute
-        (m.log_level > 0) && println("performing bound tightening without objective bounds...")
+        (m.loglevel > 0) && println("performing bound tightening without objective bounds...")
         bound_tightening(m, use_bound = false)                      # do bound tightening without objective value
         (m.disc_ratio_branch) && (m.disc_ratio = update_disc_ratio(m))
         m.presolve_bt && init_disc(m)
-        m.log_level > 0 && println("Presolve ended.")
+        m.loglevel > 0 && println("Presolve ended.")
     elseif m.status[:local_solve] == :Not_Enough_Degrees_Of_Freedom
         warn("Presolve ends with local solver yielding $(m.status[:local_solve]). \n Consider more replace equality constraints with >= and <= to resolve this.")
     else
@@ -85,7 +85,7 @@ function presolve(m::PODNonlinearModel)
     m.logs[:presolve_time] += cputime_presolve
     m.logs[:total_time] = m.logs[:presolve_time]
     m.logs[:time_left] -= m.logs[:presolve_time]
-    (m.log_level > 0) && println("Presolve time = $(@compat round.(m.logs[:total_time],2))s")
+    (m.loglevel > 0) && println("Presolve time = $(@compat round.(m.logs[:total_time],2))s")
 
     return
 end
@@ -195,7 +195,7 @@ function local_solve(m::PODNonlinearModel; presolve = false)
 
     cputime_local_solve = time() - start_local_solve
     m.logs[:total_time] += cputime_local_solve
-    m.logs[:time_left] = max(0.0, m.time_limit - m.logs[:total_time])
+    m.logs[:time_left] = max(0.0, m.timeout - m.logs[:total_time])
 
     status_pass = [:Optimal, :Suboptimal, :UserLimit, :LocalOptimal]
     status_heuristic = [:Heuristics]
@@ -255,7 +255,7 @@ function bounding_solve(m::PODNonlinearModel)
     start_bounding_solve = time()
     status = solve(m.model_mip, suppress_warnings=true)
     m.logs[:total_time] += time() - start_bounding_solve
-    m.logs[:time_left] = max(0.0, m.time_limit - m.logs[:total_time])
+    m.logs[:time_left] = max(0.0, m.timeout - m.logs[:total_time])
     # ================= Solve End ================ #
 
     status_solved = [:Optimal, :UserObjLimit, :UserLimit, :Suboptimal]

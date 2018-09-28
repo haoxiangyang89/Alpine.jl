@@ -8,9 +8,9 @@ CurrentModule = POD
 
 There are some general paremters that controls the behavior of the AMP:
 
-* `log_level(default=0)`: verbosity of the algorihtm, set to `1` for turning on logging, `100` for detailed debugging mode
+* `loglevel(default=0)`: verbosity of the algorihtm, set to `1` for turning on logging, `100` for detailed debugging mode
 
-* `time_limit(default=Inf)`: total time regulated for the solver in seconds
+* `timeout(default=Inf)`: total time regulated for the solver in seconds
 
 * `max_iter(default=999)`: total iteration allowed in the [`global_solve`](@ref)
 
