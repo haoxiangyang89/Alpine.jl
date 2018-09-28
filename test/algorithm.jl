@@ -7,7 +7,7 @@
                        presolve_bt=false,
                        presolve_bp=true,
                        presolve_bt_precision=1e-1,
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -23,7 +23,7 @@ end
                            bilinear_convexhull=false,
                            monomial_convexhull=false,
                            presolve_bp=true,
-    					   loglevel=100,
+    					   log_level=100,
                            max_iter=3,
     					   presolve_bt_min_bound_width=1e-3,
     					   presolve_bt=false,
@@ -45,7 +45,7 @@ end
                            monomial_convexhull=false,
                            presolve_bp=true,
                            disc_var_pick=1,
-                           loglevel=100,
+                           log_level=100,
                            max_iter=3,
                            presolve_bt_min_bound_width=1e-3,
                            presolve_bt=false)
@@ -68,7 +68,7 @@ end
 							   presolve_bt_algo=2,
                                presolve_bp=true,
                                presolve_bt_precision=1e-1,
-							   loglevel=100)
+							   log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -82,7 +82,7 @@ end
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
 							   mip_solver=CbcSolver(loglevel=0),
                                bilinear_convexhull=false,
-							   loglevel=100,
+							   log_level=100,
                                max_iter=3,
 							   presolve_bt_min_bound_width=1e-3,
 							   presolve_bt_precision=1e-1,
@@ -106,7 +106,7 @@ end
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
                                mip_solver=pavito_solver,
                                bilinear_convexhull=false,
-                               loglevel=100,
+                               log_level=100,
                                max_iter=2,
                                presolve_bt=true,
                                presolve_bt_min_bound_width=1e-3,
@@ -130,7 +130,7 @@ end
                        monomial_convexhull=true,
                        presolve_bt=false,
                        presolve_bp=true,
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -147,7 +147,7 @@ end
                        presolve_bt=true,
                        presolve_bp=true,
                        presolve_bt_algo=2,
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -163,7 +163,7 @@ end
                        monomial_convexhull=true,
                        presolve_bt=false,
                        presolve_bp=false,
-                       loglevel=100)
+                       log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -181,7 +181,7 @@ end
                            presolve_bt = false,
                            presolve_bt_algo = 1,
                            presolve_bt_precision = 1e-1,
-                           loglevel=100)
+                           log_level=100)
 
     m = circle(solver=test_solver)
     solve(m)
@@ -197,7 +197,7 @@ end
                            presolve_bt = false,
                            presolve_bt_algo = 1,
                            presolve_bt_precision = 1e-1,
-                           loglevel=100)
+                           log_level=100)
 
     m = circleN(solver=test_solver, N=4)
     solve(m)
@@ -212,7 +212,7 @@ end
                        presolve_bt=false,
                        presolve_bp=true,
                        convhull_formulation="facet",
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -229,7 +229,7 @@ end
                        presolve_bt=false,
                        presolve_bp=true,
                        convhull_formulation="mini",
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -249,7 +249,7 @@ end
                                max_iter=4,
                                presolve_bp=false,
                                presolve_bt=false,
-                               loglevel=1)
+                               log_level=1)
 
         m = multi4N(solver=test_solver, N=2, exprmode=i)
         status = solve(m)
@@ -268,7 +268,7 @@ end
                            max_iter=4,
                            presolve_bp=false,
                            presolve_bt=false,
-                           loglevel=1)
+                           log_level=1)
 
     m = multi2(solver=test_solver)
     status = solve(m)
@@ -289,7 +289,7 @@ end
                                max_iter=4,
                                presolve_bp=false,
                                presolve_bt=false,
-                               loglevel=1)
+                               log_level=1)
 
         m = multi3N(solver=test_solver, N=2, exprmode=i)
         status = solve(m)
@@ -308,7 +308,7 @@ end
                            max_iter=3,
                            presolve_bp=false,
                            presolve_bt=false,
-                           loglevel=1)
+                           log_level=1)
 
     m = multiKND(solver=test_solver, randomub=50, K=3, N=3, D=0)
     status = solve(m)
@@ -327,7 +327,7 @@ end
                        presolve_bp=false,
                        max_iter=4,
                        convhull_formulation="facet",
-                       loglevel=100)
+                       log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -347,7 +347,7 @@ end
                        presolve_bp=false,
                        max_iter=4,
                        convhull_formulation="mini",
-                       loglevel=100)
+                       log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -367,7 +367,7 @@ end
                            max_iter=1,
                            presolve_bp=true,
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = nlp3(solver=test_solver)
     solve(m)
@@ -384,7 +384,7 @@ end
                            max_iter=1,
                            presolve_bp=true,
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = nlp3(solver=test_solver)
     solve(m)
@@ -401,7 +401,7 @@ end
                            max_iter=1,
                            presolve_bp=true,
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = castro2m2(solver=test_solver)
     solve(m)
@@ -418,7 +418,7 @@ end
                            max_iter=1,
                            presolve_bp=true,
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = multi3N(solver=test_solver, N=3, exprmode=1)
     solve(m)
@@ -435,7 +435,7 @@ end
                            max_iter=1,
                            presolve_bp=false,
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = multi3N(solver=test_solver, N=3, exprmode=1)
     solve(m)
@@ -452,7 +452,7 @@ end
                            max_iter=1,
                            presolve_bp=true,
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = multi4N(solver=test_solver, N=2, exprmode=1)
     solve(m)
@@ -469,7 +469,7 @@ end
                            max_iter=1,
                            presolve_bp=false,
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = multi4N(solver=test_solver, N=2, exprmode=1)
     solve(m)
@@ -486,7 +486,7 @@ end
                            max_iter=1,
                            presolve_bp=true,
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = multi4N(solver=test_solver, N=2, exprmode=2)
     solve(m)
@@ -500,7 +500,7 @@ end
                           nlp_solver=IpoptSolver(print_level=0),
                           mip_solver=CbcSolver(loglevel=0),
                           presolve_bt=false,
-                          loglevel=100)
+                          log_level=100)
 
     m = bpml_lnl(test_solver)
     solve(m)
@@ -523,7 +523,7 @@ end
                           nlp_solver=IpoptSolver(print_level=0),
                           mip_solver=CbcSolver(loglevel=0),
                           presolve_bt=false,
-                          loglevel=100)
+                          log_level=100)
 
     m = bpml_binl(test_solver)
     solve(m)
@@ -556,7 +556,7 @@ end
     test_solver=PODSolver(minlp_solver=pavito_solver,
                           nlp_solver=IpoptSolver(print_level=0),
                           mip_solver=pavito_solver,
-                          loglevel=100)
+                          log_level=100)
 
     m = bpml_monl(test_solver)
     solve(m)
@@ -614,7 +614,7 @@ end
                           nlp_solver=IpoptSolver(print_level=0),
                           mip_solver=pavito_solver,
                           disc_var_pick=1,
-                          loglevel=100)
+                          log_level=100)
 
     m = bpml_negative(test_solver)
     solve(m)
@@ -653,7 +653,7 @@ end
                        presolve_bt=false,
                        presolve_bp=true,
                        convhull_ebd=true,
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -671,7 +671,7 @@ end
                        presolve_bp=true,
                        presolve_bt_algo=2,
                        convhull_ebd=true,
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -688,7 +688,7 @@ end
                        presolve_bt=false,
                        presolve_bp=false,
                        convhull_ebd=true,
-                       loglevel=100)
+                       log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -708,7 +708,7 @@ end
                            presolve_bt_algo=1,
                            presolve_bt_precision=1e-1,
                            convhull_ebd=true,
-                           loglevel=100)
+                           log_level=100)
 
     m = circle(solver=test_solver)
     solve(m)
@@ -724,7 +724,7 @@ end
                        presolve_bp=true,
                        convhull_ebd=true,
                        convhull_ebd_ibs=true,
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -742,7 +742,7 @@ end
                        presolve_bp=false,
                        convhull_ebd=true,
                        convhull_ebd_ibs=true,
-                       loglevel=100)
+                       log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -763,7 +763,7 @@ end
                            presolve_bt_precision=1e-1,
                            convhull_ebd=true,
                            convhull_ebd_ibs=true,
-                           loglevel=100)
+                           log_level=100)
 
     m = circle(solver=test_solver)
     solve(m)
@@ -779,7 +779,7 @@ end
                        presolve_bp=true,
                        convhull_ebd=true,
                        convhull_ebd_link=true,
-                       loglevel=100)
+                       log_level=100)
     m = nlp1(solver=test_solver)
     status = solve(m)
 
@@ -797,7 +797,7 @@ end
                        presolve_bp=false,
                        convhull_ebd=true,
                        convhull_ebd_link=true,
-                       loglevel=100)
+                       log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -818,7 +818,7 @@ end
                            presolve_bt_precision=1e-1,
                            convhull_ebd=true,
                            convhull_ebd_link=true,
-                           loglevel=100)
+                           log_level=100)
 
     m = circle(solver=test_solver)
     solve(m)
@@ -831,7 +831,7 @@ end
                            max_iter=1,
                            colorful_pod="warmer",
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
 
     m = castro4m2(solver=test_solver)
     status = solve(m)
@@ -846,7 +846,7 @@ end
                           mip_solver=CbcSolver(loglevel=0),
                           presolve_bp=true,
                           disc_var_pick=1,
-                          loglevel=100,
+                          log_level=100,
                           max_iter=3,
                           presolve_bt_min_bound_width=1e-3,
                           presolve_bt=false)
@@ -864,7 +864,7 @@ end
                            max_iter=1,
                            colorful_pod="solarized",
                            presolve_bt=false,
-                           loglevel=100)
+                           log_level=100)
     m = convex_solve(solver=test_solver)
     status = solve(m)
     @test status == :Optimal
@@ -879,7 +879,7 @@ end
                            presolve_bt=false,
                            colorful_pod="random",
                            timeout=100000,
-                           loglevel=100)
+                           log_level=100)
     m = nlp3(solver=test_solver)
     solve(m)
     @test isapprox(m.objBound, 6561.7156;atol=1e-3)
@@ -894,7 +894,7 @@ end
                             monomial_convexhull=true,
                             presolve_bp=true,
                             presolve_bt=false,
-                            loglevel=100)
+                            log_level=100)
     m = binprod_nlp3(solver=test_solver)
     status = solve(m)
 

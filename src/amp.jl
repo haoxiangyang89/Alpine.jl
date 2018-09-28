@@ -337,9 +337,9 @@ function insert_partition(m::PODNonlinearModel, var::Int, partidx::Int, point::N
         for i in 2:m.disc_divert_chunks
             insert!(partvec, pos+1, lb_local + chunk * (m.disc_divert_chunks-(i-1)))
         end
-        (m.loglevel > 199) && println("[DEBUG] !D! VAR$(var): SOL=$(round(point_orig,4))=>$(point) |$(round(lb_local,4)) | $(m.disc_divert_chunks) SEGMENTS | $(round(ub_local,4))|")
+        (m.log_level > 199) && println("[DEBUG] !D! VAR$(var): SOL=$(round(point_orig,4))=>$(point) |$(round(lb_local,4)) | $(m.disc_divert_chunks) SEGMENTS | $(round(ub_local,4))|")
     else
-        (m.loglevel > 199) && println("[DEBUG] VAR$(var): SOL=$(round(point,4)) RADIUS=$(radius), PARTITIONS=$(length(partvec)-1) |$(round(lb_local,4)) |$(round(lb_new,6)) <- * -> $(round(ub_new,6))| $(round(ub_local,4))|")
+        (m.log_level > 199) && println("[DEBUG] VAR$(var): SOL=$(round(point,4)) RADIUS=$(radius), PARTITIONS=$(length(partvec)-1) |$(round(lb_local,4)) |$(round(lb_new,6)) <- * -> $(round(ub_new,6))| $(round(ub_local,4))|")
     end
 
     return
@@ -357,7 +357,7 @@ function add_uniform_partition(m::PODNonlinearModel; kwargs...)
         chunk = distance / ((m.logs[:n_iter]+1)*m.disc_uniform_rate)
         discretization[i] = [lb_local+chunk*(j-1) for j in 1:(m.logs[:n_iter]+1)*m.disc_uniform_rate]
         push!(discretization[i], ub_local)   # Safety Scheme
-        (m.loglevel > 199) && println("[DEBUG] VAR$(i): RATE=$(m.disc_uniform_rate), PARTITIONS=$(length(discretization[i]))  |$(round(lb_local,4)) | $(m.disc_uniform_rate*(1+m.logs[:n_iter])) SEGMENTS | $(round(ub_local,4))|")
+        (m.log_level > 199) && println("[DEBUG] VAR$(i): RATE=$(m.disc_uniform_rate), PARTITIONS=$(length(discretization[i]))  |$(round(lb_local,4)) | $(m.disc_uniform_rate*(1+m.logs[:n_iter])) SEGMENTS | $(round(ub_local,4))|")
     end
 
     return discretization
@@ -394,11 +394,11 @@ function update_disc_ratio(m::PODNonlinearModel, presolve=false)
             println("Expensive disc branching pass... Fixed at 8")
             return 8
         end
-        m.loglevel > 0 && println("BRANCH RATIO = $(r), METRIC = $(res) || TIME = $(time()-st)")
+        m.log_level > 0 && println("BRANCH RATIO = $(r), METRIC = $(res) || TIME = $(time()-st)")
     end
 
     if std(res_collector) >= 1e-2    # Detect if all solution are similar to each other
-        m.loglevel > 0 && println("RATIO BRANCHING OFF due to solution variance test passed.")
+        m.log_level > 0 && println("RATIO BRANCHING OFF due to solution variance test passed.")
         m.disc_ratio_branch = false # If an incumbent ratio is selected, then stop the branching scheme
     end
 
@@ -408,7 +408,7 @@ function update_disc_ratio(m::PODNonlinearModel, presolve=false)
         m.discretization = add_adaptive_partition(m, use_disc=m.discretization, branching=true, use_ratio=incumb_ratio)
     end
 
-    m.loglevel > 0 && println("INCUMB_RATIO = $(incumb_ratio)")
+    m.log_level > 0 && println("INCUMB_RATIO = $(incumb_ratio)")
 
     return incumb_ratio
 end

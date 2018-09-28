@@ -30,7 +30,7 @@ end
 
 function logging_summary(m::PODNonlinearModel)
 
-    if m.loglevel > 0
+    if m.log_level > 0
         print_with_color(:light_yellow, "full problem loaded into POD\n")
         println("problen sense $(m.sense_orig)")
         println("# of constraints = ", m.num_constr_orig)

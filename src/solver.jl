@@ -6,7 +6,7 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
     colorful_pod::Any                                           # Turn on for a colorful logs
 
     # basic solver parameters
-    loglevel::Int                                               # Verbosity flag: 0 for quiet, 1 for basic solve info, 2 for iteration info (default = 1)
+    log_level::Int                                              # Verbosity flag: 0 for quiet, 1 for basic solve info, 2 for iteration info (default = 1)
     timeout::Float64                                            # Time limit for algorithm (in seconds, default = Inf) 
     max_iter::Int                                               # Target Maximum Iterations (default = 99)
     rel_gap::Float64                                            # Relative optimality gap termination condition (default = 1e-4)
@@ -162,7 +162,7 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
 
     # constructor
     function PODNonlinearModel(colorful_pod,
-                                loglevel, timeout, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
+                                log_level, timeout, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
                                 nlp_solver,
                                 minlp_solver,
                                 mip_solver,
@@ -209,7 +209,7 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
 
         m.colorful_pod = colorful_pod
 
-        m.loglevel = loglevel
+        m.log_level = log_level
         m.timeout = timeout
         m.max_iter = max_iter
         m.rel_gap = rel_gap
@@ -322,7 +322,7 @@ type PODSolver <: MathProgBase.AbstractMathProgSolver
 
     colorful_pod::Any
 
-    loglevel::Int
+    log_level::Int
     timeout::Float64
     max_iter::Int
     rel_gap::Float64
@@ -386,7 +386,7 @@ end
 function PODSolver(;
     colorful_pod = false,
 
-    loglevel = 1,
+    log_level = 1,
     timeout = Inf,
     max_iter = 99,
     rel_gap = 1e-4,
@@ -469,7 +469,7 @@ function PODSolver(;
 
     # Deepcopy the solvers because we may change option values inside POD
     PODSolver(colorful_pod,
-        loglevel, timeout, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
+        log_level, timeout, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
         deepcopy(nlp_solver),
         deepcopy(minlp_solver),
         deepcopy(mip_solver),
@@ -523,7 +523,7 @@ function MathProgBase.NonlinearModel(s::PODSolver)
     # Translate options into old nonlinearmodel.jl fields
     colorful_pod = s.colorful_pod
 
-    loglevel = s.loglevel
+    log_level = s.log_level
     timeout = s.timeout
     max_iter = s.max_iter
     rel_gap = s.rel_gap
@@ -582,7 +582,7 @@ function MathProgBase.NonlinearModel(s::PODSolver)
     int_fully_disc = s.int_fully_disc
 
     return PODNonlinearModel(colorful_pod,
-                            loglevel, timeout, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
+                            log_level, timeout, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
                             nlp_solver,
                             minlp_solver,
                             mip_solver,

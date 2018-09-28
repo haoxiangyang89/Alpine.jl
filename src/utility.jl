@@ -55,7 +55,7 @@ function measure_relaxed_deviation(m::PODNonlinearModel;sol=nothing)
     sort!(dev, by=x->x[1])
 
     for i in dev
-        m.loglevel > 199 && println("Y-VAR$(i[1]): DIST=$(i[2]) || Y-hat = $(i[3]), Y-val = $(i[4]) || COMP $(i[5])")
+        m.log_level > 199 && println("Y-VAR$(i[1]): DIST=$(i[2]) || Y-hat = $(i[3]), Y-val = $(i[4]) || COMP $(i[5])")
     end
 
     return
@@ -197,7 +197,7 @@ function check_solution_history(m::PODNonlinearModel, ind::Int)
         !isapprox(sol_val, m.bound_sol_history[search_pos][ind]; atol=m.disc_rel_width_tol) && return false
     end
 
-    m.loglevel > 99 && println("Consecutive bounding solution on VAR$(ind) obtained. Diverting...")
+    m.log_level > 99 && println("Consecutive bounding solution on VAR$(ind) obtained. Diverting...")
     return true
 end
 
@@ -347,9 +347,9 @@ function merge_solution_pool(m::PODNonlinearModel, s::Dict)
     m.bound_sol_pool[:vars] = var_idxs
 
     # Show the summary
-    m.loglevel > 99 && println("POOL size = $(length([i for i in 1:m.bound_sol_pool[:cnt] if m.bound_sol_pool[:stat][i] != :Dead])) / $(m.bound_sol_pool[:cnt]) ")
+    m.log_level > 99 && println("POOL size = $(length([i for i in 1:m.bound_sol_pool[:cnt] if m.bound_sol_pool[:stat][i] != :Dead])) / $(m.bound_sol_pool[:cnt]) ")
     for i in 1:m.bound_sol_pool[:cnt]
-        m.loglevel > 99 && m.bound_sol_pool[:stat][i] != :Dead && println("ITER $(m.bound_sol_pool[:iter][i]) | SOL $(i) | POOL solution obj = $(m.bound_sol_pool[:obj][i])")
+        m.log_level > 99 && m.bound_sol_pool[:stat][i] != :Dead && println("ITER $(m.bound_sol_pool[:iter][i]) | SOL $(i) | POOL solution obj = $(m.bound_sol_pool[:obj][i])")
     end
 
     return
@@ -605,7 +605,7 @@ function weighted_min_vertex_cover(m::PODNonlinearModel, distance::Dict)
     weights = Dict()
     for i in m.candidate_disc_vars
         isapprox(distance[i], 0.0; atol=1e-6) ? weights[i] = heavy : (weights[i]=(1/distance[i]))
-        (m.loglevel > 100) && println("VAR$(i) WEIGHT -> $(weights[i]) ||| DISTANCE -> $(distance[i])")
+        (m.log_level > 100) && println("VAR$(i) WEIGHT -> $(weights[i]) ||| DISTANCE -> $(distance[i])")
     end
 
     # Set up minimum vertex cover problem
@@ -623,7 +623,7 @@ function weighted_min_vertex_cover(m::PODNonlinearModel, distance::Dict)
     xVal = getvalue(x)
     m.num_var_disc_mip = Int(sum(xVal))
     m.disc_vars = [i for i in nodes if xVal[i] > 0 && abs(m.u_var_tight[i]-m.l_var_tight[i]) >= m.tol]
-    m.loglevel >= 99 && println("UPDATED DISC-VAR COUNT = $(length(m.disc_vars)) : $(m.disc_vars)")
+    m.log_level >= 99 && println("UPDATED DISC-VAR COUNT = $(length(m.disc_vars)) : $(m.disc_vars)")
 
     return
 end
@@ -684,20 +684,20 @@ function eval_feasibility(m::PODNonlinearModel, sol::Vector)
         if m.constr_type_orig[i] == :(==)
             if !isapprox(eval_rhs[i], m.l_constr_orig[i]; atol=m.tol)
                 feasible = false
-                m.loglevel >= 100 && println("[BETA] Violation on CONSTR $(i) :: EVAL $(eval_rhs[i]) != RHS $(m.l_constr_orig[i])")
-                m.loglevel >= 100 && println("[BETA] CONSTR $(i) :: $(m.bounding_constr_expr_mip[i])")
+                m.log_level >= 100 && println("[BETA] Violation on CONSTR $(i) :: EVAL $(eval_rhs[i]) != RHS $(m.l_constr_orig[i])")
+                m.log_level >= 100 && println("[BETA] CONSTR $(i) :: $(m.bounding_constr_expr_mip[i])")
                 return false
             end
         elseif m.constr_type_orig[i] == :(>=)
             if !(eval_rhs[i] >= m.l_constr_orig[i] - m.tol)
-                m.loglevel >= 100 && println("[BETA] Violation on CONSTR $(i) :: EVAL $(eval_rhs[i]) !>= RHS $(m.l_constr_orig[i])")
-                m.loglevel >= 100 && println("[BETA] CONSTR $(i) :: $(m.bounding_constr_expr_mip[i])")
+                m.log_level >= 100 && println("[BETA] Violation on CONSTR $(i) :: EVAL $(eval_rhs[i]) !>= RHS $(m.l_constr_orig[i])")
+                m.log_level >= 100 && println("[BETA] CONSTR $(i) :: $(m.bounding_constr_expr_mip[i])")
                 return false
             end
         elseif m.constr_type_orig[i] == :(<=)
             if !(eval_rhs[i] <= m.u_constr_orig[i] + m.tol)
-                m.loglevel >= 100 && println("[BETA] Violation on CONSTR $(i) :: EVAL $(eval_rhs[i]) !<= RHS $(m.u_constr_orig[i])")
-                m.loglevel >= 100 && println("[BETA] CONSTR $(i) :: $(m.bounding_constr_expr_mip[i])")
+                m.log_level >= 100 && println("[BETA] Violation on CONSTR $(i) :: EVAL $(eval_rhs[i]) !<= RHS $(m.u_constr_orig[i])")
+                m.log_level >= 100 && println("[BETA] CONSTR $(i) :: $(m.bounding_constr_expr_mip[i])")
                 return false
             end
         end

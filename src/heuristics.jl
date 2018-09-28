@@ -38,7 +38,7 @@ function update_disc_cont_var(m::PODNonlinearModel)
     distance = Dict(zip(var_idxs,var_diffs))
     weighted_min_vertex_cover(m, distance)
 
-    (m.loglevel > 100) && println("updated partition var selection => $(m.disc_vars)")
+    (m.log_level > 100) && println("updated partition var selection => $(m.disc_vars)")
     return
 end
 
@@ -71,14 +71,14 @@ function heu_basic_rounding(m::PODNonlinearModel, local_model)
     heuristic_model_status = interface_get_status(heuristic_model)
 
     if heuristic_model_status in [:Infeasible, :Error]
-        m.loglevel > 0 && println("Rounding obtained an Infeasible point.")
+        m.log_level > 0 && println("Rounding obtained an Infeasible point.")
         push!(m.logs[:obj], "INF")
         return :Infeasibles
     elseif heuristic_model_status in [:Optimal, :Suboptimal, :UserLimit, :LocalOptimal]
         candidate_obj = interface_get_objval(heuristic_model)
         candidate_sol = round.(interface_get_solution(heuristic_model), 5)
         update_incumb_objective(m, candidate_obj, candidate_sol)
-        m.loglevel > 0 && println("Rounding obtained a feasible solution OBJ = $(m.best_obj)")
+        m.log_level > 0 && println("Rounding obtained a feasible solution OBJ = $(m.best_obj)")
         return :LocalOptimal
     else
         error("[EXCEPTION] Unknown NLP solver status.")
@@ -110,11 +110,11 @@ function heu_pool_multistart(m::PODNonlinearModel)
                 if eval(convertor[m.sense_orig])(candidate_obj, incumb_obj)
                     incumb_obj = candidate_obj
                     incumb_sol = round.(interface_get_solution(heuristic_model), 5)
-                    m.loglevel > 0 && println("Feasible solution obtained using lower bound solution pool [SOL:$(i)] [OBJ=$(incumb_obj)]")
+                    m.log_level > 0 && println("Feasible solution obtained using lower bound solution pool [SOL:$(i)] [OBJ=$(incumb_obj)]")
                 end
                 found_feasible = true
             else
-                m.loglevel > 99 && println("Multi-start heuristic returns $(heuristic_model_status) [SOL:$(i)]")
+                m.log_level > 99 && println("Multi-start heuristic returns $(heuristic_model_status) [SOL:$(i)]")
             end
             m.bound_sol_pool[:ubstart][i] = true
         end

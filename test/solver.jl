@@ -1,17 +1,17 @@
-@testset "PODNonlinearModel loading tests" begin
-    # Random Model 1
-    test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(loglevel=0),loglevel=100)
-    m = operator_c(solver=test_solver)
+# @testset "PODNonlinearModel loading tests" begin
+#     # Random Model 1
+#     test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(loglevel=0),log_level=100)
+#     m = operator_c(solver=test_solver)
 
-    status = JuMP.build(m)
-    @test isa(m.internalModel, POD.PODNonlinearModel)
+#     status = JuMP.build(m)
+#     @test isa(m.internalModel, POD.PODNonlinearModel)
 
-    # Expression Model 1
-    test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(loglevel=0),loglevel=100)
-    m = exprstest(solver=test_solver)
-    status = JuMP.build(m)
-    @test isa(m.internalModel, POD.PODNonlinearModel)
-end
+#     # Expression Model 1
+#     test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(loglevel=0),log_level=100)
+#     m = exprstest(solver=test_solver)
+#     status = JuMP.build(m)
+#     @test isa(m.internalModel, POD.PODNonlinearModel)
+# end
 
 @testset "Partitioning variable selection tests :: nlp3" begin
 
@@ -23,7 +23,7 @@ end
                             presolve_bp = false,
                             presolve_bt = false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -41,7 +41,7 @@ end
                             presolve_bp = false,
                             presolve_bt = false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -59,7 +59,7 @@ end
                             presolve_bp = false,
                             presolve_bt = false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -76,7 +76,7 @@ end
                             presolve_bp = false,
                             presolve_bt = false,
                             max_iter=2,
-                            loglevel=100)
+                            log_level=100)
     m = nlp3(solver=test_solver)
     status = solve(m)
 
@@ -97,7 +97,7 @@ end
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
 
     m = castro2m2(solver=test_solver)
     status = solve(m)
@@ -117,7 +117,7 @@ end
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
 
     m = castro2m2(solver=test_solver)
     status = solve(m)
@@ -136,7 +136,7 @@ end
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
 
     m = castro2m2(solver=test_solver)
     status = solve(m)
@@ -159,7 +159,7 @@ end
                             disc_uniform_rate=10,
                             presolve_bt=false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
 
     m = blend029_gl(solver=test_solver)
     JuMP.build(m)
@@ -178,7 +178,7 @@ end
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
 
     m = blend029_gl(solver=test_solver)
     JuMP.build(m)
@@ -197,7 +197,7 @@ end
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
 
     m = blend029_gl(solver=test_solver)
     JuMP.build(m)
@@ -218,7 +218,7 @@ end
                             presolve_bp=true,
                             presolve_bt=false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
 
     m = castro6m2(solver=test_solver)
     status = solve(m)
@@ -239,7 +239,7 @@ end
                             presolve_bp=true,
                             presolve_bt=false,
                             max_iter=2,
-                            loglevel=100)
+                            log_level=100)
 
     m = castro6m2(solver=test_solver)
     status = solve(m)
@@ -262,7 +262,7 @@ end
                             presolve_bp=false,
                             presolve_bt=false,
                             max_iter=1,
-                            loglevel=100)
+                            log_level=100)
 
     m = castro2m2(solver=test_solver)
     status = solve(m)
