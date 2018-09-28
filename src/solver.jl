@@ -3,95 +3,95 @@ export PODSolver
 type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
 
     # external developer parameters for testing and debugging
-    colorful_pod::Any                                           # Turn on for a color solver
+    colorful_pod::Any                                           # Turn on for a colorful logs
 
     # basic solver parameters
-    loglevel::Int                                               # Verbosity flag: 0 for quiet, 1 for basic solve info, 2 for iteration info
-    timeout::Float64                                            # Time limit for algorithm (in seconds)
-    maxiter::Int                                                # Target Maximum Iterations
-    relgap::Float64                                             # Relative optimality gap termination condition
-    gapref::AbstractString                                      # Relative gap reference point
-    absgap::Float64                                             # Absolute optimality gap termination condition
-    tol::Float64                                                # Numerical tol used in the algorithmic process
-    largebound::Float64                                         # Presumed large bound for problems with unbounded variables
+    log_level::Int                                              # Verbosity flag: 0 for quiet, 1 for basic solve info, 2 for iteration info (default = 1)
+    time_limit::Float64                                         # Time limit for algorithm (in seconds, default = Inf) 
+    max_iter::Int                                               # Target Maximum Iterations (default = 99)
+    rel_gap::Float64                                            # Relative optimality gap termination condition (default = 1e-4)
+    rel_gap_ref::AbstractString                                 # Relative gap reference point (default = "ub"; other option = "lb")
+    abs_gap::Float64                                            # Absolute optimality gap termination condition (default = 1e-6)
+    tol::Float64                                                # Numerical tolerance value used in the algorithmic process (default = 1e-6)
+    big_m::Float64                                              # Big M value for unbounded variables (default = 1e4)
 
-    # convexification method tuning
-    recognize_convex::Bool                                      # recognize convex expressions in parsing objective functions and constraints
-    bilinear_mccormick::Bool                                    # disable Tightening McCormick method used for for convexirfy nonlinear terms
-    bilinear_convexhull::Bool                                   # convexify bilinear terms using convex hull representation
-    monomial_convexhull::Bool                                   # convexify monomial terms using convex hull representation
+    # piecewise convexification method
+    convexity_recognition::Bool                                 # Convexity recognition (default value = true)
+    bilinear_mccormick::Bool                                    # Piecewise Bilinear Relaxation using McCormick relaxations (default = false)
+    bilinear_convexhull::Bool                                   # Piecewise Bilinear Relaxation using Lambda formulation (default = true)
+    monomial_convexhull::Bool                                   # Piecewise Monomial Relaxation using quadratic constraints (default = true)
 
-    # expression-based user-inputs
-    method_convexification::Array{Function}                     # Array of functions that user wich to use to convexify some specific non-linear temrs :: no over-ride privilege
-    method_partition_injection::Array{Function}                 # Array of functions for special methods to add partitions to variable under complex conditions
-    term_patterns::Array{Function}                              # Array of functions that user wish to use to parse/recognize nonlinear terms in constraint expression
-    constr_patterns::Array{Function}                            # Array of functions that user wish to use to parse/recognize structural constraint from expression
+    # user functions for convexification, partitioning, and nonlinear pattern recognition functions
+    piecewise_convex_relaxation_methods::Array{Function}        # Array of functions to construct piecewise relaxations for nonlinear terms :: no over-ride privilege
+    partition_injection_methods::Array{Function}                # Array of functions for special methods to add partitions to variable using complex conditions
+    term_pattern_methods::Array{Function}                       # Array of functions that user wish to use to parse/recognize nonlinear terms in constraint expression
+    constr_pattern_methods::Array{Function}                     # Array of functions that user wish to use to parse/recognize structural constraint from expression
 
     # parameters used in partitioning algorithm
-    disc_ratio::Any                                             # Discretization ratio parameter (use a fixed value for now, later switch to a function)
-    disc_uniform_rate::Int                                      # Discretization rate parameter when using uniform partitions
-    disc_var_pick::Any                                          # Algorithm for choosing the variables to discretize: 1 for minimum vertex cover, 0 for all variables
-    disc_divert_chunks::Int                                     # How many uniform partitions to construct
-    disc_add_partition_method::Any                              # Additional methods to add discretization
-    disc_abs_width_tol::Float64                                 # absolute tolerance used when setting up partition/discretizations
-    disc_rel_width_tol::Float64                                 # relative width tolerance when setting up partition/discretizations
-    disc_consecutive_forbid::Int                                # forbit bounding model to add partitions on the same spot when # steps of previous indicate the same bouding solution, done in a distributed way (per variable)
-    disc_ratio_branch::Bool                                     # Branching tests for picking fixed disc ratios
+    disc_ratio::Any                                             # Discretization ratio parameter; uses a fixed value (default = 4)
+    disc_uniform_rate::Int                                      # Discretization rate when using uniform partitions (default = 2)
+    disc_var_pick::Any                                          # Algorithm for choosing the variables to discretize: 0/1/2 (default = 2) (max. cover/min. vertex cover/automatic based on var count of 15)
+    disc_divert_chunks::Int                                     # Initial number of uniform partitions to construct (default = 5)
+    disc_add_partition_method::Any                              # Additional methods to add discretization (default = "adaptive")
+    disc_abs_width_tol::Float64                                 # Absolute width tolerance used when setting up partition/discretizations (default = 1e-4)
+    disc_rel_width_tol::Float64                                 # Relative width tolerance used when setting up partition/discretizations (default = 1e-6)
+    disc_consecutive_forbid_iter::Int                           # Number of consecutive iter. for which bounding solution is in same region, after which no partitions will be added to that region; done per variable (default = 0) 
+    disc_ratio_branch::Bool                                     # Branching tests for automated picking of discretization ratios (default = false)
 
-    # Convexifications Formulation Parameters
-    convhull_formulation::String                                # Formulation to used for relaxation
-    convhull_warmstart::Bool                                    # Warm start the bounding MIP
-    convhull_no_good_cuts::Bool                                 # Add no good cuts to MIP base on pool solutions
-    convhull_ebd::Bool                                          # Enable embedding formulation
-    convhull_ebd_encode::Any                                    # Encoding method used for convhull_ebd
+    # piecewise relaxation parameters 
+    convhull_formulation::String                                # Type of formulation to be used for formulating the Lambda-based piecewise multilinear relaxation: "sos2"/"facet" (default = "sos2")
+    convhull_warmstart::Bool                                    # Warm start the bounding solves (default = true)
+    convhull_no_good_cuts::Bool                                 # Add no good cuts to bounding solves using pooled solutions (default = true)
+    convhull_ebd::Bool                                          # Enable embedding in Lambda formulation; if true it will default to using log. number of partition binary variables (default = false) 
+    convhull_ebd_encode::Any                                    # Encoding method used for log. number of binary variables (default = "default")
     convhull_ebd_ibs::Bool                                      # Enable independent branching scheme
-    convhull_ebd_link::Bool                                     # Linking constraints between x and α, type 1 usse hierarchical and type 2 with big-m
+    convhull_ebd_link::Bool                                     # Linking constraints between x and α, if no encoding uses a traditional bounding constraint and with encoding uses a big-M type constraint
 
-    # Presolving Parameters
-    presolve_track_time::Bool                                   # Account presolve time for total time usage
-    presolve_bt::Any                                            # Perform bound tightening procedure before main algorithm
-    presolve_timeout::Float64
-    presolve_maxiter::Int                                       # Maximum iteration allowed to perform presolve (vague in parallel mode)
-    presolve_bt_width_tol::Float64                              # Numerical tol bound-tightening width
-    presolve_bt_output_tol::Float64                             # Variable bounds truncation tol
-    presolve_bt_algo::Any                                       # Method used for bound tightening procedures, can either be index of default methods or functional inputs
-    presolve_bt_relax::Bool                                     # Relax the MIP solved in built-in relaxation scheme for time performance
-    presolve_bt_mip_timeout::Float64                            # Regulate the time limit for a single MIP solved in built-in bound tighening algorithm
+    # presolve parameters
+    presolve_track_time::Bool                                   # Accounting for presolve time for total time usage (default = true)
+    presolve_bt::Any                                            # Perform bound tightening procedure before main algorithm (default = nothing)
+    presolve_time_limit::Float64                                # Presolve time limit in seconds (default = 900 seconds)
+    presolve_max_iter::Int                                      # Maximum number of bound-tightening iterations allowed (default = 10)
+    presolve_bt_min_bound_width::Float64                        # Minimum variable-bound width (default = 1e-3)
+    presolve_bt_precision::Float64                              # Variable bounds truncation precistion (default = 1e-5)
+    presolve_bt_algo::Any                                       # Method used for bound tightening procedures, can either be index of default methods or functional inputs (default = 1)
+    presolve_bt_relax::Bool                                     # During bound-tightening relax the binary variables in the original problem for performance (default = false)
+    presolve_bt_mip_time_limit::Float64                         # Time limit for a single MIP solved in built-in bound tighening algorithm (default = Inf)
+    presolve_bp::Bool                                           # Enable basic bound propagation (default = true)
+    presolve_infeasible::Bool                                   # Presolve problem feasibility flag
+    user_parameters::Dict                                       # Additional parameters used for user-defined function inputs
 
-    # Domain Reduction
-    presolve_bp::Bool                                           # Conduct basic bound propagation
-    presolve_infeasible::Bool                                   # Presolve Feasibility
-    user_parameters::Dict                                       # Additional parameters used for user-defined functional inputs
+    # integer problem parameters (NOTE: no support for integer problems, making these parameters obsolete)
+    int_enable::Bool                                            # Convert integer problem into binary problem by flatten the choice of variable domain (default = false)
+    int_cumulative_disc::Bool                                   # [INACTIVE] Cummulatively involve integer variables for discretization (default = true)
+    int_fully_disc::Bool                                        # [INACTIVE] Construct equalvaient formulation for integer variables (default = false)
 
-    # Features for Integer Problems (NOTE: no support for intlin problems)
-    int_enable::Bool                                            # Convert integer problem into binary problem by flatten the choice of variable domain
-    int_cumulative_disc::Bool                                   # [INACTIVE] Cummulatively involve integer variables for discretization
-    int_fully_disc::Bool                                        # [INACTIVE] Construct equalvaient formulation for integer variables
+    # solver inputs 
+    local_solver::MathProgBase.AbstractMathProgSolver           # Local solver for solving NLPs or MINLPs (defaults to Ipopt for NLPs and Juniper for MINLPs)
+    nlp_solver::MathProgBase.AbstractMathProgSolver             # Local continuous NLP solver for solving NLPs at each iteration : deprecate
+    minlp_solver::MathProgBase.AbstractMathProgSolver           # Local MINLP solver for solving MINLPs at each iteration : deprecate 
+    mip_solver::MathProgBase.AbstractMathProgSolver             # MILP solver for successive lower bound solves (defaults to Pavito())
 
-    # add all the solver options
-    nlp_solver::MathProgBase.AbstractMathProgSolver             # Local continuous NLP solver for solving NLPs at each iteration
-    minlp_solver::MathProgBase.AbstractMathProgSolver           # Local MINLP solver for solving MINLPs at each iteration
-    mip_solver::MathProgBase.AbstractMathProgSolver             # MILP solver for successive lower bound solves
-
-    # Sub-solver identifier for cusomized solver option
-    nlp_solver_id::AbstractString                               # NLP Solver identifier string
-    minlp_solver_id::AbstractString                             # MINLP local solver identifier string
+    # solver ids for customized solver options
+    local_solver_id::AbstractString                             # Local solver identifier string
+    nlp_solver_id::AbstractString                               # NLP Solver identifier string : deprecate
+    minlp_solver_id::AbstractString                             # MINLP local solver identifier string : deprecate
     mip_solver_id::AbstractString                               # MIP solver identifier string
 
     # initial data provided by user
-    num_var_orig::Int                                           # Initial number of variables
-    num_cont_var_orig::Int                                      # Initial number of continuous variables
-    num_int_var_orig::Int                                       # Initial number of binary/integer variables
-    num_constr_orig::Int                                        # Initial number of constraints
-    num_lconstr_orig::Int                                       # Initial number of linear constraints
-    num_nlconstr_orig::Int                                      # Initial number of non-linear constraints
+    num_var_orig::Int                                           # Number of variables in the NLP/MINLP 
+    num_cont_var_orig::Int                                      # Number of continuous variables in the NLP/MINLP 
+    num_int_var_orig::Int                                       # Number of binary/integer variables in the NLP/MINLP 
+    num_constr_orig::Int                                        # Number of constraints in the NLP/MINLP 
+    num_lin_constr_orig::Int                                    # Number of linear constraints in the NLP/MINLP 
+    num_nl_constr_orig::Int                                     # Number of nonlinear constraints in the NLP/MINLP 
     var_type_orig::Vector{Symbol}                               # Variable type vector on original variables (only :Bin, :Cont, :Int)
     var_start_orig::Vector{Float64}                             # Variable warm start vector on original variables
     constr_type_orig::Vector{Symbol}                            # Constraint type vector on original variables (only :(==), :(>=), :(<=))
     constr_expr_orig::Vector{Expr}                              # Constraint expressions
     obj_expr_orig::Expr                                         # Objective expression
 
-    # extra initial data that is useful for non-linear local continuous solves
+    # extra initial data that is useful for local solves 
     l_var_orig::Vector{Float64}                                 # Variable lower bounds
     u_var_orig::Vector{Float64}                                 # Variable upper bounds
     l_constr_orig::Vector{Float64}                              # Constraint lower bounds
@@ -109,14 +109,14 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
     num_nlconstr_updated::Int                                   # Updated number of non-linear constraints
     indexes_lconstr_updated::Vector{Int}                        # Indexes of updated linear constraints
 
-    # local solution model extra data for each iteration
+    # variable bound vectors for local solves at each iteration 
     l_var::Vector{Float64}                                      # Updated variable lower bounds for local solve
     u_var::Vector{Float64}                                      # Updated variable upper bounds for local solve
 
     # mixed-integer convex program bounding model
-    model_mip::JuMP.Model                                       # JuMP convex MIP model for bounding
+    model_mip::JuMP.Model                                       # JuMP convex MIP model for obtaining bounds at each iteration 
 
-    num_var_linear_mip::Int                                     # Number of linear lifting variables required.
+    num_var_linear_mip::Int                                     # Number of linear lifting variables required
     num_var_nonlinear_mip::Int                                  # Number of lifted variables
     num_var_disc_mip::Int                                       # Number of variables on which discretization is performed
     num_constr_convex::Int                                      # Number of structural constraints
@@ -140,40 +140,40 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
     int_vars::Vector{Int}                                       # Index vector of integer variables
     bin_vars::Vector{Int}                                       # Index vector of binary variable
 
-    # Re-formulated problem
+    # Reformulated problem
     l_var_tight::Vector{Float64}                                # Tightened variable upper bounds
     u_var_tight::Vector{Float64}                                # Tightened variable Lower Bounds
     var_type::Vector{Symbol}                                    # Updated variable type for local solve
 
     # Solution information
-    best_bound::Float64                                         # Best bound from MIP
-    best_obj::Float64                                           # Best feasible objective value
-    best_sol::Vector{Float64}                                   # Best feasible solution
-    best_bound_sol::Vector{Float64}                             # Best bound solution
+    best_bound::Float64                                         # Best bound to the original NLP/MINLP 
+    best_obj::Float64                                           # Best incumbent objective for the original NLP/MINLP  
+    best_sol::Vector{Float64}                                   # Best incumbent solution values for the original NLP/MINLP  
+    best_bound_sol::Vector{Float64}                             # Best bound variable values for the original NLP/MINLP 
     best_rel_gap::Float64                                       # Relative optimality gap = |best_bound - best_obj|/|best_obj|
     best_abs_gap::Float64                                       # Absolute gap = |best_bound - best_obj|
-    bound_sol_history::Vector{Vector{Float64}}                  # History of bounding solutions limited by parameter disc_consecutive_forbid
+    bound_sol_history::Vector{Vector{Float64}}                  # History of bounding solutions limited by parameter disc_consecutive_forbid_iter
     bound_sol_pool::Dict{Any, Any}                              # A pool of solutions from solving model_mip
 
     # Logging information and status
     logs::Dict{Symbol,Any}                                      # Logging information
     status::Dict{Symbol,Symbol}                                 # Detailed status of each different phases in algorithm
-    pod_status::Symbol                                          # Current POD status
+    pod_status::Symbol                                          # Current POD solver status 
 
     # constructor
     function PODNonlinearModel(colorful_pod,
-                                loglevel, timeout, maxiter, relgap, gapref, absgap, tol, largebound,
+                                log_level, time_limit, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
                                 nlp_solver,
                                 minlp_solver,
                                 mip_solver,
-                                recognize_convex,
+                                convexity_recognition,
                                 bilinear_mccormick,
                                 bilinear_convexhull,
                                 monomial_convexhull,
-                                method_convexification,
-                                method_partition_injection,
-                                term_patterns,
-                                constr_patterns,
+                                piecewise_convex_relaxation_methods,
+                                partition_injection_methods,
+                                term_pattern_methods,
+                                constr_pattern_methods,
                                 disc_var_pick,
                                 disc_ratio,
                                 disc_uniform_rate,
@@ -181,7 +181,7 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
                                 disc_divert_chunks,
                                 disc_abs_width_tol,
                                 disc_rel_width_tol,
-                                disc_consecutive_forbid,
+                                disc_consecutive_forbid_iter,
                                 disc_ratio_branch,
                                 convhull_formulation,
                                 convhull_ebd,
@@ -192,13 +192,13 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
                                 convhull_no_good_cuts,
                                 presolve_track_time,
                                 presolve_bt,
-                                presolve_timeout,
-                                presolve_maxiter,
-                                presolve_bt_width_tol,
-                                presolve_bt_output_tol,
+                                presolve_time_limit,
+                                presolve_max_iter,
+                                presolve_bt_min_bound_width,
+                                presolve_bt_precision,
                                 presolve_bt_algo,
                                 presolve_bt_relax,
-                                presolve_bt_mip_timeout,
+                                presolve_bt_mip_time_limit,
                                 presolve_bp,
                                 user_parameters,
                                 int_enable,
@@ -209,24 +209,24 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
 
         m.colorful_pod = colorful_pod
 
-        m.loglevel = loglevel
-        m.timeout = timeout
-        m.maxiter = maxiter
-        m.relgap = relgap
-        m.gapref = gapref
-        m.absgap = absgap
+        m.log_level = log_level
+        m.time_limit = time_limit
+        m.max_iter = max_iter
+        m.rel_gap = rel_gap
+        m.rel_gap_ref = rel_gap_ref
+        m.abs_gap = abs_gap
         m.tol = tol
-        m.largebound = largebound
+        m.big_m = big_m
 
-        m.recognize_convex = recognize_convex
+        m.convexity_recognition = convexity_recognition
         m.bilinear_mccormick = bilinear_mccormick
         m.bilinear_convexhull = bilinear_convexhull
         m.monomial_convexhull = monomial_convexhull
 
-        m.method_convexification = method_convexification
-        m.method_partition_injection = method_partition_injection
-        m.term_patterns = term_patterns
-        m.constr_patterns = constr_patterns
+        m.piecewise_convex_relaxation_methods = piecewise_convex_relaxation_methods
+        m.partition_injection_methods = partition_injection_methods
+        m.term_pattern_methods = term_pattern_methods
+        m.constr_pattern_methods = constr_pattern_methods
 
         m.disc_var_pick = disc_var_pick
         m.disc_ratio = disc_ratio
@@ -235,7 +235,7 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
         m.disc_divert_chunks = disc_divert_chunks
         m.disc_abs_width_tol = disc_abs_width_tol
         m.disc_rel_width_tol = disc_rel_width_tol
-        m.disc_consecutive_forbid = disc_consecutive_forbid
+        m.disc_consecutive_forbid_iter = disc_consecutive_forbid_iter
         m.disc_ratio_branch = disc_ratio_branch
 
         m.convhull_formulation = convhull_formulation
@@ -248,13 +248,13 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
 
         m.presolve_track_time = presolve_track_time
         m.presolve_bt = presolve_bt
-        m.presolve_timeout = presolve_timeout
-        m.presolve_maxiter = presolve_maxiter
-        m.presolve_bt_width_tol = presolve_bt_width_tol
-        m.presolve_bt_output_tol = presolve_bt_output_tol
+        m.presolve_time_limit = presolve_time_limit
+        m.presolve_max_iter = presolve_max_iter
+        m.presolve_bt_min_bound_width = presolve_bt_min_bound_width
+        m.presolve_bt_precision = presolve_bt_precision
         m.presolve_bt_algo = presolve_bt_algo
         m.presolve_bt_relax = presolve_bt_relax
-        m.presolve_bt_mip_timeout = presolve_bt_mip_timeout
+        m.presolve_bt_mip_time_limit = presolve_bt_mip_time_limit
 
         m.presolve_bp = presolve_bp
 
@@ -271,8 +271,8 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
         m.num_cont_var_orig = 0
         m.num_int_var_orig = 0
         m.num_constr_orig = 0
-        m.num_lconstr_orig = 0
-        m.num_nlconstr_orig = 0
+        m.num_lin_constr_orig = 0
+        m.num_nl_constr_orig = 0
         m.var_type_orig = Symbol[]
         m.var_start_orig = Float64[]
         m.constr_type_orig = Symbol[]
@@ -300,7 +300,7 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
         m.best_bound_sol = []
         m.bound_sol_history = []
         m.presolve_infeasible = false
-        m.bound_sol_history = Vector{Vector{Float64}}(m.disc_consecutive_forbid)
+        m.bound_sol_history = Vector{Vector{Float64}}(m.disc_consecutive_forbid_iter)
 
         m.best_obj = Inf
         m.best_bound = -Inf
@@ -322,28 +322,28 @@ type PODSolver <: MathProgBase.AbstractMathProgSolver
 
     colorful_pod::Any
 
-    loglevel::Int
-    timeout::Float64
-    maxiter::Int
-    relgap::Float64
-    gapref::AbstractString
-    absgap::Float64
+    log_level::Int
+    time_limit::Float64
+    max_iter::Int
+    rel_gap::Float64
+    rel_gap_ref::AbstractString
+    abs_gap::Float64
     tol::Float64
-    largebound::Float64
+    big_m::Float64
 
     nlp_solver::MathProgBase.AbstractMathProgSolver
     minlp_solver::MathProgBase.AbstractMathProgSolver
     mip_solver::MathProgBase.AbstractMathProgSolver
 
-    recognize_convex::Bool
+    convexity_recognition::Bool
     bilinear_mccormick::Bool
     bilinear_convexhull::Bool
     monomial_convexhull::Bool
 
-    method_convexification::Array{Function}
-    method_partition_injection::Array{Function}
-    term_patterns::Array{Function}
-    constr_patterns::Array{Function}
+    piecewise_convex_relaxation_methods::Array{Function}
+    partition_injection_methods::Array{Function}
+    term_pattern_methods::Array{Function}
+    constr_pattern_methods::Array{Function}
 
     disc_var_pick::Any
     disc_ratio::Any
@@ -352,7 +352,7 @@ type PODSolver <: MathProgBase.AbstractMathProgSolver
     disc_divert_chunks::Int
     disc_abs_width_tol::Float64
     disc_rel_width_tol::Float64
-    disc_consecutive_forbid::Int
+    disc_consecutive_forbid_iter::Int
     disc_ratio_branch::Bool
 
     convhull_formulation::String
@@ -365,13 +365,13 @@ type PODSolver <: MathProgBase.AbstractMathProgSolver
 
     presolve_track_time::Bool
     presolve_bt::Any
-    presolve_timeout::Float64
-    presolve_maxiter::Int
-    presolve_bt_width_tol::Float64
-    presolve_bt_output_tol::Float64
+    presolve_time_limit::Float64
+    presolve_max_iter::Int
+    presolve_bt_min_bound_width::Float64
+    presolve_bt_precision::Float64
     presolve_bt_algo::Any
     presolve_bt_relax::Bool
-    presolve_bt_mip_timeout::Float64
+    presolve_bt_mip_time_limit::Float64
 
     presolve_bp::Bool
 
@@ -386,28 +386,28 @@ end
 function PODSolver(;
     colorful_pod = false,
 
-    loglevel = 1,
-    timeout = Inf,
-    maxiter = 99,
-    relgap = 1e-4,
-    gapref = "ub",
-    absgap = 1e-6,
+    log_level = 1,
+    time_limit = Inf,
+    max_iter = 99,
+    rel_gap = 1e-4,
+    rel_gap_ref = "ub",
+    abs_gap = 1e-6,
     tol = 1e-6,
-    largebound = 1e4,
+    big_m = 1e4,
 
     nlp_solver = UnsetSolver(),
     minlp_solver = UnsetSolver(),
     mip_solver = UnsetSolver(),
 
-    recognize_convex = true,
+    convexity_recognition = true,
     bilinear_mccormick = false,
     bilinear_convexhull = true,
     monomial_convexhull = true,
 
-    method_convexification = Array{Function}(0),
-    method_partition_injection = Array{Function}(0),
-    term_patterns = Array{Function}(0),
-    constr_patterns = Array{Function}(0),
+    piecewise_convex_relaxation_methods = Array{Function}(0),
+    partition_injection_methods = Array{Function}(0),
+    term_pattern_methods = Array{Function}(0),
+    constr_pattern_methods = Array{Function}(0),
 
     disc_var_pick = 2,                      # By default use the 15-variable selective rule
     disc_ratio = 4,
@@ -416,7 +416,7 @@ function PODSolver(;
     disc_divert_chunks = 5,
     disc_abs_width_tol = 1e-4,
     disc_rel_width_tol = 1e-6,
-    disc_consecutive_forbid = 0,
+    disc_consecutive_forbid_iter = 0,
     disc_ratio_branch=false,
 
     convhull_formulation = "sos2",
@@ -428,14 +428,14 @@ function PODSolver(;
     convhull_no_good_cuts = true,
 
     presolve_track_time = true,
-    presolve_maxiter = 10,
+    presolve_max_iter = 10,
     presolve_bt = nothing,
-    presolve_timeout = 900,
-    presolve_bt_width_tol = 1e-3,
-    presolve_bt_output_tol = 1e-5,
+    presolve_time_limit = 900,
+    presolve_bt_min_bound_width = 1e-3,
+    presolve_bt_precision = 1e-5,
     presolve_bt_algo = 1,
     presolve_bt_relax = false,
-    presolve_bt_mip_timeout = Inf,
+    presolve_bt_mip_time_limit = Inf,
 
     presolve_bp = true,
 
@@ -454,7 +454,7 @@ function PODSolver(;
     nlp_solver == UnsetSolver() && error("No NLP local solver specified (set nlp_solver)\n")
     mip_solver == UnsetSolver() && error("NO MIP solver specififed (set mip_solver)\n")
 
-    gapref in ["ub", "lb"] || error("Gap calculation only takes 'ub' pr 'lb'")
+    rel_gap_ref in ["ub", "lb"] || error("Gap calculation only takes 'ub' pr 'lb'")
 
     # String Code Conversion
     if disc_var_pick in ["ncvar_collect_nodes", "all", "max"]
@@ -469,18 +469,18 @@ function PODSolver(;
 
     # Deepcopy the solvers because we may change option values inside POD
     PODSolver(colorful_pod,
-        loglevel, timeout, maxiter, relgap, gapref, absgap, tol, largebound,
+        log_level, time_limit, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
         deepcopy(nlp_solver),
         deepcopy(minlp_solver),
         deepcopy(mip_solver),
-        recognize_convex,
+        convexity_recognition,
         bilinear_mccormick,
         bilinear_convexhull,
         monomial_convexhull,
-        method_convexification,
-        method_partition_injection,
-        term_patterns,
-        constr_patterns,
+        piecewise_convex_relaxation_methods,
+        partition_injection_methods,
+        term_pattern_methods,
+        constr_pattern_methods,
         disc_var_pick,
         disc_ratio,
         disc_uniform_rate,
@@ -488,7 +488,7 @@ function PODSolver(;
         disc_divert_chunks,
         disc_abs_width_tol,
         disc_rel_width_tol,
-        disc_consecutive_forbid,
+        disc_consecutive_forbid_iter,
         disc_ratio_branch,
         convhull_formulation,
         convhull_ebd,
@@ -499,13 +499,13 @@ function PODSolver(;
         convhull_no_good_cuts,
         presolve_track_time,
         presolve_bt,
-        presolve_timeout,
-        presolve_maxiter,
-        presolve_bt_width_tol,
-        presolve_bt_output_tol,
+        presolve_time_limit,
+        presolve_max_iter,
+        presolve_bt_min_bound_width,
+        presolve_bt_precision,
         presolve_bt_algo,
         presolve_bt_relax,
-        presolve_bt_mip_timeout,
+        presolve_bt_mip_time_limit,
         presolve_bp,
         user_parameters,
         int_enable,
@@ -523,24 +523,24 @@ function MathProgBase.NonlinearModel(s::PODSolver)
     # Translate options into old nonlinearmodel.jl fields
     colorful_pod = s.colorful_pod
 
-    loglevel = s.loglevel
-    timeout = s.timeout
-    maxiter = s.maxiter
-    relgap = s.relgap
-    gapref = s.gapref
-    absgap = s.absgap
+    log_level = s.log_level
+    time_limit = s.time_limit
+    max_iter = s.max_iter
+    rel_gap = s.rel_gap
+    rel_gap_ref = s.rel_gap_ref
+    abs_gap = s.abs_gap
     tol = s.tol
-    largebound = s.largebound
+    big_m = s.big_m
 
-    recognize_convex = s.recognize_convex
+    convexity_recognition = s.convexity_recognition
     bilinear_mccormick = s.bilinear_mccormick
     bilinear_convexhull = s.bilinear_convexhull
     monomial_convexhull = s.monomial_convexhull
 
-    method_convexification = s.method_convexification
-    method_partition_injection = s.method_partition_injection
-    term_patterns = s.term_patterns
-    constr_patterns = s.constr_patterns
+    piecewise_convex_relaxation_methods = s.piecewise_convex_relaxation_methods
+    partition_injection_methods = s.partition_injection_methods
+    term_pattern_methods = s.term_pattern_methods
+    constr_pattern_methods = s.constr_pattern_methods
 
     nlp_solver = s.nlp_solver
     minlp_solver = s.minlp_solver
@@ -553,7 +553,7 @@ function MathProgBase.NonlinearModel(s::PODSolver)
     disc_divert_chunks = s.disc_divert_chunks
     disc_abs_width_tol = s.disc_abs_width_tol
     disc_rel_width_tol = s.disc_rel_width_tol
-    disc_consecutive_forbid = s.disc_consecutive_forbid
+    disc_consecutive_forbid_iter = s.disc_consecutive_forbid_iter
     disc_ratio_branch = s.disc_ratio_branch
 
     convhull_formulation = s.convhull_formulation
@@ -566,13 +566,13 @@ function MathProgBase.NonlinearModel(s::PODSolver)
 
     presolve_track_time = s.presolve_track_time
     presolve_bt = s.presolve_bt
-    presolve_timeout = s.presolve_timeout
-    presolve_maxiter = s.presolve_maxiter
-    presolve_bt_width_tol = s.presolve_bt_width_tol
-    presolve_bt_output_tol = s.presolve_bt_output_tol
+    presolve_time_limit = s.presolve_time_limit
+    presolve_max_iter = s.presolve_max_iter
+    presolve_bt_min_bound_width = s.presolve_bt_min_bound_width
+    presolve_bt_precision = s.presolve_bt_precision
     presolve_bt_algo = s.presolve_bt_algo
     presolve_bt_relax = s.presolve_bt_relax
-    presolve_bt_mip_timeout = s.presolve_bt_mip_timeout
+    presolve_bt_mip_time_limit = s.presolve_bt_mip_time_limit
 
     presolve_bp = s.presolve_bp
 
@@ -582,18 +582,18 @@ function MathProgBase.NonlinearModel(s::PODSolver)
     int_fully_disc = s.int_fully_disc
 
     return PODNonlinearModel(colorful_pod,
-                            loglevel, timeout, maxiter, relgap, gapref, absgap, tol, largebound,
+                            log_level, time_limit, max_iter, rel_gap, rel_gap_ref, abs_gap, tol, big_m,
                             nlp_solver,
                             minlp_solver,
                             mip_solver,
-                            recognize_convex,
+                            convexity_recognition,
                             bilinear_mccormick,
                             bilinear_convexhull,
                             monomial_convexhull,
-                            method_convexification,
-                            method_partition_injection,
-                            term_patterns,
-                            constr_patterns,
+                            piecewise_convex_relaxation_methods,
+                            partition_injection_methods,
+                            term_pattern_methods,
+                            constr_pattern_methods,
                             disc_var_pick,
                             disc_ratio,
                             disc_uniform_rate,
@@ -601,7 +601,7 @@ function MathProgBase.NonlinearModel(s::PODSolver)
                             disc_divert_chunks,
                             disc_abs_width_tol,
                             disc_rel_width_tol,
-                            disc_consecutive_forbid,
+                            disc_consecutive_forbid_iter,
                             disc_ratio_branch,
                             convhull_formulation,
                             convhull_ebd,
@@ -612,13 +612,13 @@ function MathProgBase.NonlinearModel(s::PODSolver)
                             convhull_no_good_cuts,
                             presolve_track_time,
                             presolve_bt,
-                            presolve_timeout,
-                            presolve_maxiter,
-                            presolve_bt_width_tol,
-                            presolve_bt_output_tol,
+                            presolve_time_limit,
+                            presolve_max_iter,
+                            presolve_bt_min_bound_width,
+                            presolve_bt_precision,
                             presolve_bt_algo,
                             presolve_bt_relax,
-                            presolve_bt_mip_timeout,
+                            presolve_bt_mip_time_limit,
                             presolve_bp,
                             user_parameters,
                             int_enable,
@@ -686,15 +686,15 @@ function MathProgBase.loadproblem!(m::PODNonlinearModel,
     m.constr_structure = [:none for i in 1:m.num_constr_orig]
     for i = 1:m.num_constr_orig
         if interface_is_constr_linear(m.d_orig, i)
-            m.num_lconstr_orig += 1
+            m.num_lin_constr_orig += 1
             m.constr_structure[i] = :generic_linear
         else
-            m.num_nlconstr_orig += 1
+            m.num_nl_constr_orig += 1
             m.constr_structure[i] = :generic_nonlinear
         end
     end
 
-    @assert m.num_constr_orig == m.num_nlconstr_orig + m.num_lconstr_orig
+    @assert m.num_constr_orig == m.num_nl_constr_orig + m.num_lin_constr_orig
     m.is_obj_linear_orig = interface_is_obj_linear(m.d_orig)
     m.is_obj_linear_orig ? (m.obj_structure = :generic_linear) : (m.obj_structure = :generic_nonlinear)
 

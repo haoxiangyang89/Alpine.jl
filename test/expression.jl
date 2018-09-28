@@ -1,6 +1,6 @@
 @testset "Expression Parsing || bilinear || Affine || exprs.jl" begin
 
-    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(log_level=0),log_level=100)
 
     m=exprstest(solver=test_solver)
 
@@ -114,8 +114,8 @@ end
 
 @testset "Expression Parsing || bilinear || Affine || nlp1.jl" begin
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                           mip_solver=CbcSolver(logLevel=0),
-                           loglevel=100)
+                           mip_solver=CbcSolver(log_level=0),
+                           log_level=100)
     m=nlp1(solver=test_solver)
 
     JuMP.build(m)
@@ -134,7 +134,7 @@ end
 
 @testset "Expression Parsing || bilinear || Affine || nlp3.jl" begin
 
-    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(log_level=0),log_level=100)
 
     m=nlp3(solver=test_solver)
 
@@ -210,8 +210,8 @@ end
 @testset "Expression Parsing || bilinear || Simple || bi1.jl " begin
 
     test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                           mip_solver=CbcSolver(logLevel=0),
-                           loglevel=100)
+                           mip_solver=CbcSolver(log_level=0),
+                           log_level=100)
 
     m = operator_c(solver=test_solver)
 
@@ -230,7 +230,7 @@ end
 
 @testset "Expression Parsing || bilinear || Complex || blend029.jl " begin
 
-    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(log_level=0),log_level=100)
 
     m = blend029(solver=test_solver)
 
@@ -342,7 +342,7 @@ end
 
 @testset "Expression Parsing || multilinear || Simple || multi.jl " begin
 
-    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(log_level=0),log_level=100)
 
     m = multi3(solver=test_solver, exprmode=1)
 
@@ -650,7 +650,7 @@ end
 end
 
 @testset "Expression Parsing || bilinear || Complex-div || div.jl" begin
-    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+    test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),mip_solver=CbcSolver(log_level=0),log_level=100)
 
     m = div(solver=test_solver)
 
@@ -739,7 +739,7 @@ end
 end
 
 @testset "Expression Parsing || part1 " begin
-    m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(logLevel=0),loglevel=100))
+    m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100))
     @variable(m, x[1:4]>=0)
     @NLconstraint(m, x[1]^2 >= 1)  				  # Basic monomial x[5]=x[1]^2
     @NLconstraint(m, x[1]*x[2] <= 1)				  # x[6] <= 1 : x[6] = x[1]*x[2]
@@ -776,7 +776,7 @@ end
 end
 
 @testset "Expression Parsing || part2" begin
-    m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(logLevel=0),loglevel=100))
+    m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100))
 
     @variable(m, x[1:4]>=0)
     @NLconstraint(m, (x[1]*x[2]) * x[3] >= 1)
@@ -830,7 +830,7 @@ end
 end
 
 @testset "Expression Parsing || part3" begin
-    m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(logLevel=0),loglevel=100))
+    m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100))
 
     @variable(m, x[1:4]>=0)
     @NLconstraint(m, ((x[1]*x[2])*x[3])*x[4] >= 1)
@@ -891,7 +891,7 @@ end
 end
 
 @testset "Expression Parsing || part7" begin
-    m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(logLevel=0),loglevel=100))
+    m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100))
     @variable(m, x[1:4]>=0)
 
     @NLconstraint(m, x[1]*x[2]*x[3]*x[4] >= 1)
@@ -939,8 +939,8 @@ end
 
 @testset "Expression Parsing || part8" begin
     m = Model(solver=PODSolver(nlp_solver=IpoptSolver(),
-           mip_solver=CbcSolver(logLevel=0),
-           loglevel=100))
+           mip_solver=CbcSolver(log_level=0),
+           log_level=100))
     @variable(m, x[1:4]>=0)
 
     @NLconstraint(m, (x[1]*x[2]*x[3])*x[4] >= 1)
@@ -991,7 +991,7 @@ end
 
     @testset "Convex Parsing :: PART I" begin
 
-        test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver = PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100)
         m = convex_test(test_solver)
 
         JuMP.build(m)
@@ -1198,7 +1198,7 @@ end
         test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
                                mip_solver=CbcSolver(),
                                disc_ratio=8,
-                               loglevel=100)
+                               log_level=100)
 
         m = nlp2(solver=test_solver)
 
@@ -1245,8 +1245,8 @@ end
 
     @testset "Expression Parsing || Linear Lifting || general" begin
         test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                               mip_solver=CbcSolver(logLevel=0),
-                               loglevel=100)
+                               mip_solver=CbcSolver(log_level=0),
+                               log_level=100)
 
         m = basic_linear_lift(solver=test_solver)
 
@@ -1326,8 +1326,8 @@ end
 
     @testset "Expression Parsing || complex || Affine || operator_b" begin
         test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                                mip_solver=CbcSolver(logLevel=0),
-                                loglevel=100)
+                                mip_solver=CbcSolver(log_level=0),
+                                log_level=100)
 
         m=operator_b(solver=test_solver)
 
@@ -1417,7 +1417,7 @@ end
         test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
                             mip_solver=CbcSolver(),
                             disc_ratio=8,
-                            loglevel=100)
+                            log_level=100)
 
         m = brainpc3(solver=test_solver)
 
@@ -2057,8 +2057,8 @@ end
 @testset "Expression Parsing || Basic Multiplication Operators (Machine Generated for diffs)" begin
 
     test_solver=PODSolver(nlp_solver=IpoptSolver(),
-                           mip_solver=CbcSolver(logLevel=0),
-                           loglevel=100)
+                           mip_solver=CbcSolver(log_level=0),
+                           log_level=100)
 
     m = operator_basic(solver=test_solver)
     JuMP.build(m)
@@ -2889,8 +2889,8 @@ end
 @testset "Expression Parsing || corner cases" begin
     @testset "Corner Cases - 1 : sign convertor special case" begin
         test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                                mip_solver=CbcSolver(logLevel=0),
-                                loglevel=100)
+                                mip_solver=CbcSolver(log_level=0),
+                                log_level=100)
 
         m = Model(solver=test_solver)
         @variable(m, x[1:5], Bin)
@@ -2907,8 +2907,8 @@ end
 
     @testset "Corner Cases - 2 : full sub-expression" begin
         test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                                mip_solver=CbcSolver(logLevel=0),
-                                loglevel=100)
+                                mip_solver=CbcSolver(log_level=0),
+                                log_level=100)
 
         m = Model(solver=test_solver)
         @variable(m, x[1:5]>=0)
@@ -2931,8 +2931,8 @@ end
 
     @testset "Corner Cases - 2 : full sub-expression" begin
         test_solver = PODSolver(nlp_solver=IpoptSolver(print_level=0),
-                                mip_solver=CbcSolver(logLevel=0),
-                                loglevel=100)
+                                mip_solver=CbcSolver(log_level=0),
+                                log_level=100)
 
         m = Model(solver=test_solver)
         @variable(m, x[1:5]>=0)
@@ -2958,7 +2958,7 @@ end
 
     @testset "Expression Parsing || bmpl && binlin && binprod" begin
 
-        test_solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100)
 
         m = bpml(solver=test_solver)
 
@@ -3009,7 +3009,7 @@ end
 
     @testset "Expression Parsing || bmpl && binlin && binprod with linear lifting and coefficients" begin
 
-        test_solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100)
 
         m = bmpl_linearlifting(solver=test_solver)
 
@@ -3135,7 +3135,7 @@ end
     end
 
     @testset "Expression Parsing || INTPROD Operators" begin
-        test_solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver=PODSolver(nlp_solver=IpoptSolver(),mip_solver=CbcSolver(log_level=0),log_level=100)
         m = intprod_basic(solver=test_solver)
 
         JuMP.build(m) # Setup internal model
@@ -3219,7 +3219,7 @@ end
     end
 
     @testset "Expression Parsing || ex1225a" begin
-        test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(log_level=0),log_level=100)
         m = ex1225a(solver=test_solver)
 
         JuMP.build(m)
@@ -3600,7 +3600,7 @@ end
     end
 
     @testset "Expression Parsing || prob10" begin
-        test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(log_level=0),log_level=100)
         m = prob10(solver=test_solver)
 
         JuMP.build(m)
@@ -3653,7 +3653,7 @@ end
     end
 
     @testset "Expression Parsing || prob03" begin
-        test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(log_level=0),log_level=100)
         m = prob03(solver=test_solver)
 
         JuMP.build(m)
@@ -3677,7 +3677,7 @@ end
     end
 
     @testset "Expression Parsing || st_miqp5" begin
-        test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(log_level=0),log_level=100)
         m = st_miqp5(solver=test_solver)
 
         JuMP.build(m)
@@ -3768,7 +3768,7 @@ end
 
     @testset "Expression Parsing || discretemulti_basic" begin
 
-		test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(logLevel=0),loglevel=100)
+		test_solver = PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(log_level=0),log_level=100)
 		m = discretemulti_basic(solver=test_solver)
 
 		JuMP.build(m)
@@ -4118,7 +4118,7 @@ end
 @testset "Expression Parsing || sin/cos" begin
     @testset "Expression Parsing || sin/cos || specialopts " begin
 
-        test_solver=PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver=PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(log_level=0),log_level=100)
 
         m = specialopts(solver=test_solver)
         JuMP.build(m)
@@ -4158,7 +4158,7 @@ end
 
     @testset "Expression Parsing || sin/cos || sincos_p1" begin
 
-        test_solver=PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver=PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(log_level=0),log_level=100)
         m = sincos_p1(solver=test_solver)
         JuMP.build(m)
 
@@ -4429,7 +4429,7 @@ end
     end
 
     @testset "Expression Parsing || sin/cos || trig" begin
-        test_solver=PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(logLevel=0),loglevel=100)
+        test_solver=PODSolver(nlp_solver=IpoptSolver(), mip_solver=CbcSolver(log_level=0),log_level=100)
         m = trig(solver=test_solver)
         JuMP.build(m)
         @test m.internalModel.nonconvex_terms[Dict{Symbol,Any}(Pair{Symbol,Any}(:vars, Any[7]),Pair{Symbol,Any}(:scalar, 1.0),Pair{Symbol,Any}(:operator, :sin))][:y_idx] == 8

@@ -35,8 +35,8 @@ Specific structure pattern information will be described formally.
 function detect_nonconvex_terms(expr::Any, constr_id::Int, m::PODNonlinearModel; kwargs...)
 
     # First process user-defined structures in-cases of over-ride
-    for i in 1:length(m.term_patterns)
-        skip, expr = eval(m.term_patterns[i])(expr, constr_id, m)
+    for i in 1:length(m.term_pattern_methods)
+        skip, expr = eval(m.term_pattern_methods[i])(expr, constr_id, m)
         skip && return expr
     end
 
@@ -98,7 +98,7 @@ function store_nonconvex_term(m::PODNonlinearModel, nl_key::Any, var_idxs::Any, 
 
     # push!(m.var_type, :Cont)  # TODO check if this replacement is good since additional constraints should be able to sufficiently constraint the type
     push!(m.var_type, m.nonconvex_terms[nl_key][:y_type])            # Keep track of the lifted var type
-    m.loglevel > 199 && println("found lifted $(term_type) term $(lifted_constr_ref)")
+    m.log_level > 199 && println("found lifted $(term_type) term $(lifted_constr_ref)")
     return y_idx
 end
 
@@ -124,7 +124,7 @@ function store_linear_term(m::PODNonlinearModel, term_key::Any, expr::Any)#, bou
 
     m.term_seq[l_cnt+nl_cnt + 1] = term_key
     push!(m.var_type, m.linear_terms[term_key][:y_type]) # Keep track of the lifted var type
-    m.loglevel > 199 && println("found lifted linear term $(lifted_var_ref) = $expr")
+    m.log_level > 199 && println("found lifted linear term $(lifted_var_ref) = $expr")
 
     return y_idx
 end
@@ -1276,7 +1276,7 @@ function resolve_convex_constr(expr::Any, m::PODNonlinearModel=nothing, idx::Int
                                           :cnt => length(idxs_bin),
                                           :powers => power_bin)
 
-        m.loglevel > 99 && println("CONVEX Constraint $(idx): $(expr)")
+        m.log_level > 99 && println("CONVEX Constraint $(idx): $(expr)")
 
         return true
     elseif expr_orig == :obj
@@ -1326,7 +1326,7 @@ function resolve_convex_constr(expr::Any, m::PODNonlinearModel=nothing, idx::Int
                                   :cnt => length(idxs_bin),
                                   :powers => power_bin)
 
-        m.loglevel > 99 && println("CONVEX Objective: $(expr)")
+        m.log_level > 99 && println("CONVEX Objective: $(expr)")
         return true
     end
 

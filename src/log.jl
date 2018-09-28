@@ -6,7 +6,7 @@ function create_logs!(m)
     # Timers
     logs[:presolve_time] = 0.       # Total presolve-time of the algorithm
     logs[:total_time] = 0.          # Total run-time of the algorithm
-    logs[:time_left] = m.timeout    # Total remaining time of the algorithm if timeout is specified
+    logs[:time_left] = m.time_limit    # Total remaining time of the algorithm if time_limit is specified
 
     # Values
     logs[:obj] = []                 # Iteration based objective
@@ -24,18 +24,18 @@ end
 
 function reset_timer(m::PODNonlinearModel)
     m.logs[:total_time] = 0.
-    m.logs[:time_left] = m.timeout
+    m.logs[:time_left] = m.time_limit
     return m
 end
 
 function logging_summary(m::PODNonlinearModel)
 
-    if m.loglevel > 0
+    if m.log_level > 0
         print_with_color(:light_yellow, "full problem loaded into POD\n")
         println("problen sense $(m.sense_orig)")
         println("# of constraints = ", m.num_constr_orig)
-        println("# of non-linear constraints = ", m.num_nlconstr_orig)
-        println("# of linear constraints = ", m.num_lconstr_orig)
+        println("# of non-linear constraints = ", m.num_nl_constr_orig)
+        println("# of linear constraints = ", m.num_lin_constr_orig)
         println("# of continuous variables = ", length([i for i in 1:m.num_var_orig if m.var_type[i] == :Cont]))
         println("# of binary variables = ", length([i for i in 1:m.num_var_orig if m.var_type[i] == :Bin]))
         println("# of integer variables = ", length([i for i in 1:m.num_var_orig if m.var_type[i] == :Int]))
@@ -55,17 +55,17 @@ function logging_summary(m::PODNonlinearModel)
         println("MIP solver = ", split(string(m.mip_solver),".")[1])
         println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
         println("                    SOLVER CONFIGURATION ")
-        println("maximum solution time = ", m.timeout)
-        println("maximum iterations =  ", m.maxiter)
-        @printf "relative optimality gap criteria = %.5f (%.4f %%)\n" m.relgap (m.relgap*100)
+        println("maximum solution time = ", m.time_limit)
+        println("maximum iterations =  ", m.max_iter)
+        @printf "relative optimality gap criteria = %.5f (%.4f %%)\n" m.rel_gap (m.rel_gap*100)
         println("default tolerance = ", m.tol)
-        m.recognize_convex && println("actively recognize convex patterns")
-        m.recognize_convex && println("# of detected convex constraints = $(length([i for i in m.constr_structure if i == :convex]))")
+        m.convexity_recognition && println("actively recognize convex patterns")
+        m.convexity_recognition && println("# of detected convex constraints = $(length([i for i in m.constr_structure if i == :convex]))")
         println("basic bound propagation = ", m.presolve_bp)
         println("use piece-wise relaxation formulation on integer variables = ", m.int_enable)
         println("piece-wise relaxation formulation = $(m.convhull_formulation) formulation")
         println("method for picking discretization variable = $(m.disc_var_pick)")
-        println("conseuctive solution rejection = after ", m.disc_consecutive_forbid, " times")
+        println("conseuctive solution rejection = after ", m.disc_consecutive_forbid_iter, " times")
         if m.disc_ratio_branch
             println("discretization ratio branch activated")
         else
@@ -75,12 +75,12 @@ function logging_summary(m::PODNonlinearModel)
         (m.convhull_ebd) && println("encoding method = $(m.convhull_ebd_encode)")
         (m.convhull_ebd) && println("independent branching scheme = $(m.convhull_ebd_ibs)")
         println("bound tightening presolver = ", m.presolve_bt)
-        m.presolve_bt && println("bound tightening presolve maximum iteration = ", m.presolve_maxiter)
+        m.presolve_bt && println("bound tightening presolve maximum iteration = ", m.presolve_max_iter)
         m.presolve_bt && println("bound tightening presolve algorithm = ", m.presolve_bt_algo)
-        m.presolve_bt && println("bound tightening presolve width tolerance = ", m.presolve_bt_width_tol)
-        m.presolve_bt && println("bound tightening presolve output tolerance = ", m.presolve_bt_output_tol)
+        m.presolve_bt && println("bound tightening presolve width tolerance = ", m.presolve_bt_min_bound_width)
+        m.presolve_bt && println("bound tightening presolve output tolerance = ", m.presolve_bt_precision)
         m.presolve_bt && println("bound tightening presolve relaxation = ", m.presolve_bt_relax)
-        m.presolve_bt && println("bound tightening presolve mip regulation time = ", m.presolve_bt_mip_timeout)
+        m.presolve_bt && println("bound tightening presolve mip regulation time = ", m.presolve_bt_mip_time_limit)
         println("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *")
     end
 
@@ -210,7 +210,7 @@ function summary_status(m::PODNonlinearModel)
     # :Unknown : termination with no exception recorded
 
     if m.status[:bound] == :Detected && m.status[:feasible_solution] == :Detected
-        m.best_rel_gap > m.relgap ? m.pod_status = :UserLimits : m.pod_status = :Optimal
+        m.best_rel_gap > m.rel_gap ? m.pod_status = :UserLimits : m.pod_status = :Optimal
     elseif m.status[:bounding_solve] == :Infeasible
         m.pod_status = :Infeasible
     elseif m.status[:bound] == :Detected && m.status[:feasible_solution] == :none
