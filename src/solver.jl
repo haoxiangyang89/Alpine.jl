@@ -27,7 +27,7 @@ type PODNonlinearModel <: MathProgBase.AbstractNonlinearModel
     term_pattern_methods::Array{Function}                       # Array of functions that user wish to use to parse/recognize nonlinear terms in constraint expression
     constr_pattern_methods::Array{Function}                     # Array of functions that user wish to use to parse/recognize structural constraint from expression
 
-    # parameters used in partitioning algorithm
+    # parameters used in partitioning algorithm (todo: need to implement disc_var_pick option 3)
     disc_ratio::Any                                             # Discretization ratio parameter; uses a fixed value (default = 4)
     disc_uniform_rate::Int                                      # Discretization rate when using uniform partitions (default = 2)
     disc_var_pick::Any                                          # Algorithm for choosing the variables to discretize: 0/1/2 (default = 2) (max. cover/min. vertex cover/automatic based on var count of 15)
