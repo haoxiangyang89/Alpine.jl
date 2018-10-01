@@ -18,5 +18,5 @@ pavito_solver=PavitoSolver(mip_solver=CbcSolver(loglevel=0), cont_solver=IpoptSo
 # Performe Tests
 include("$(poddir)/test/solver.jl")
 # include("$(poddir)/test/expression.jl")
-# include("$(poddir)/test/algorithm.jl")
+include("$(poddir)/test/algorithm.jl")
 # include("$(poddir)/test/utility.jl")

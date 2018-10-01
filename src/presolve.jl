@@ -146,7 +146,7 @@ function minmax_bound_tightening(m::PODNonlinearModel; use_bound = true, timelim
         avg_reduction = total_reduction/length(keys(temp_bounds))
         keeptightening = (avg_reduction > 1e-3)
         
-        (m.log_level > 0) && print("\n")
+        (m.log_level > 0) && print("+")
         discretization = resolve_var_bounds(m, discretization)
         if haskey(options, :use_tmc)
             discretization = add_adaptive_partition(m, use_solution=m.best_sol, use_disc=flatten_discretization(discretization))
