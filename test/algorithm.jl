@@ -43,6 +43,31 @@ end
     @test m.internalModel.logs[:n_iter] == 1
 
 end 
+
+@testset " Validation Test || PBT-AMP || basic solve " begin 
+    test_solver = PODSolver(nlp_solver = IpoptSolver(print_level=0),
+                       mip_solver = pavito_solver,
+                       bilinear_convexhull = false,
+                       monomial_convexhull = false,
+                       presolve_bt = true,
+                       presolve_bt_algo = 2, 
+                       presolve_bp = false,
+                       log_level = 1,
+                       colorful_pod = "random")
+    
+    m = Model(solver=test_solver)
+    @variable(m, -10 <= x <= 100)
+    @variable(m, -10 <= y <= 10)
+    @objective(m, Min, x + y)
+    @NLconstraint(m, x*x + y*y - 2*x*y == 1)
+
+    status = solve(m)
+
+    @test status == :Optimal
+    @test isapprox(m.objVal, -19; atol=1e-2)
+    @test m.internalModel.logs[:n_iter] == 1
+
+end 
 # @testset " Validation Test || AMP-TMC || minimum-vertex solving || examples/nlp3.jl (3 iterations)" begin
 
 #     test_solver=PODSolver(nlp_solver=IpoptSolver(print_level=0, max_iter=9999),
