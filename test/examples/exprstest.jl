@@ -171,7 +171,7 @@ function operator_c(;solver=nothing)
 
 	m = Model(solver=solver)
 
-	@variable(m, px[i=1:6]>=1) # At some point if an initial value is given, keep them
+	@variable(m, px[i=1:6] >= 1) 
 
 	@NLconstraint(m, sum(3*px[i]^2 for i=1:4) >= 111)
 	@NLconstraint(m,  -1 * px[1]*px[2] + 4*5*px[3]*px[4] >= 222)
